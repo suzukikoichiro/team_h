@@ -1,14 +1,12 @@
 <h2>ホーム画面</h2>
 
 {% if request.session.school_name %}
-  <p>学校: <strong>{{ request.session.school_name }}</strong></p>
-{% endif %}
-
-{% if request.session.login_user_id %}
-  <p>ユーザーID: <strong>{{ request.session.login_user_id }}</strong></p>
-  <p>氏名: <strong>{{ request.session.user_name }}</strong></p>
-  <a href="{% url 'user_logout' %}">ログアウト</a>
+<p>学校: <strong>{{ request.session.school_name }}</strong></p>
+{% endif %} {% if request.session.login_user_id %}
+<p>ユーザーID: <strong>{{ request.session.login_user_id }}</strong></p>
+<p>氏名: <strong>{{ request.session.user_name }}</strong></p>
+<a href="{% url 'user_logout' %}">ログアウト</a>
 {% else %}
-  <p>まだユーザーログインしていません。</p>
-  <a href="{% url 'user_login' %}">ユーザーログインへ</a>
+<p>まだユーザーログインしていません。</p>
+<a href="{% url 'user_login' %}">ユーザーログインへ</a>
 {% endif %}

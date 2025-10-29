@@ -1,6 +1,23 @@
-<h2>学校 新規登録</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">登録</button>
+<h2>学校・管理者 新規登録</h2>
+
+<form method="post" novalidate>
+  {% csrf_token %} {% if messages %}
+  <ul>
+    {% for m in messages %}
+    <li>{{ m }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <fieldset style="margin-bottom: 20px">
+    <legend><strong>学校情報</strong></legend>
+    {{ school_form.non_field_errors }} {{ school_form.as_p }}
+  </fieldset>
+
+  <fieldset>
+    <legend><strong>管理者情報</strong></legend>
+    {{ user_form.non_field_errors }} {{ user_form.as_p }}
+  </fieldset>
+
+  <button type="submit" style="margin-top: 20px">登録</button>
 </form>

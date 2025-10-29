@@ -1,9 +1,9 @@
-# core/models.py
 from django.db import models
 
 class School(models.Model):
-    school_name = models.CharField(max_length=100)
     school_id = models.CharField(max_length=20, unique=True)
+    school_name = models.CharField(max_length=100)
+    address = models.CharField(max_length=200, blank=True)
     school_password = models.CharField(max_length=50)
 
     def __str__(self):
@@ -11,10 +11,19 @@ class School(models.Model):
 
 
 class User(models.Model):
+    user_id = models.IntegerField()
+    user_name = models.CharField(max_length=50)
+    user_spell = models.CharField(max_length=50, default="")
+    gendar = models.IntegerField(default=0)
+    birthdate = models.DateField()
+    user_password = models.CharField(max_length=20)
+    user_position = models.IntegerField(default=0)
     school = models.ForeignKey(School, on_delete=models.CASCADE)
-    user_name = models.CharField(max_length=50)     # 表示名（任意）
-    user_id = models.CharField(max_length=20, unique=True)  # ← ログイン用
-    user_password = models.CharField(max_length=50)
+    class_id = models.IntegerField(null=True)
+
+    class Meta:
+        unique_together = ('user_id', 'school')
 
     def __str__(self):
         return f"{self.user_name} ({self.user_id}) - {self.school.school_name}"
+
