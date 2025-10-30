@@ -11,10 +11,15 @@ class School(models.Model):
 
 
 class User(models.Model):
+    GENDER_CHOICES = [
+        (0, '男性'),
+        (1, '女性'),
+        (2, 'その他'),
+    ]
     user_id = models.IntegerField()
     user_name = models.CharField(max_length=50)
     user_spell = models.CharField(max_length=50, default="")
-    gendar = models.IntegerField(default=0)
+    gendar = models.IntegerField(choices=GENDER_CHOICES, default=0)
     birthdate = models.DateField()
     user_password = models.CharField(max_length=20)
     user_position = models.IntegerField(default=0)
