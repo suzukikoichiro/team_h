@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>教職員登録</title>
+  </head>
+  <body>
+    <h1>教職員登録</h1>
+    <form method="post">
+      {% csrf_token %}
+      <p>{{ form.user_id.label_tag }} {{ form.user_id }}</p>
+      <p>{{ form.user_name.label_tag }} {{ form.user_name }}</p>
+      <p>{{ form.user_spell.label_tag }} {{ form.user_spell }}</p>
+      <p>{{ form.gendar.label_tag }} {{ form.gendar }}</p>
+      <p>{{ form.birthdate.label_tag }} {{ form.birthdate }}</p>
+      <p>{{ form.user_password.label_tag }} {{ form.user_password }}</p>
+
+      <div>
+        <label>{{ form.classes.label }}</label>
+        <div class="checkbox-group">{{ form.classes }}</div>
+      </div>
+
+      <button type="submit">登録</button>
+    </form>
+    {% if form.errors %}
+    <div style="color: red">{{ form.errors }}</div>
+    {% endif %} {% if error %}
+    <div style="color: red">{{ error }}</div>
+    {% endif %}
+
+    <a href="{% url 'home' %}">ホームへ戻る</a>
+  </body>
+</html>

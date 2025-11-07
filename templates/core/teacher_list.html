@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>教職員一覧</title>
+<body class="bg-light">
+  <div class="container mt-4">
+    <h2 class="mb-4">教職員一覧</h2>
+<a href="{% url 'teacher_register' %}">新しい教職員を登録</a><br />
+    {% if teachers %}
+    <table class="table table-bordered table-striped shadow-sm">
+      <thead class="table-primary">
+        <tr>
+          <th>ユーザーID</th>
+          <th>氏名</th>
+          <th>ふりがな</th>
+          <th>性別</th>
+          <th>生年月日</th>
+          <th>所属学校</th>
+          <th>所属クラス</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for teacher in teachers %}
+        <tr>
+          <td>{{ teacher.user_id }}</td>
+          <td>{{ teacher.user_name }}</td>
+          <td>{{ teacher.user_spell }}</td>
+          <td>{{ teacher.get_gendar_display }}</td>
+          <td>{{ teacher.birthdate }}</td>
+          <td>{{ teacher.school.school_name }}</td>
+          <td>
+            {% for c in teacher.classes.all %}
+              {{ c.class_name }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              -
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="alert alert-warning">登録されている教職員はいません。</div>
+    {% endif %}
+
+    <div class="mt-3">
+      <a href="{% url 'home' %}" class="btn btn-secondary">ホームへ戻る</a>
+    </div>
+  </div>
+</body>
+</html>

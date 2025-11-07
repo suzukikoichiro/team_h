@@ -1,0 +1,26 @@
+<h2>クラス一覧</h2>
+<a href="{% url 'class_create' %}">新しいクラスを登録</a><br />
+<table border="1">
+  <thead>
+    <tr>
+      <th>クラスID</th>
+      <th>学年</th>
+      <th>クラス名</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in classes %}
+    <tr>
+      <td>{{ c.class_id }}</td>
+      <td>{{ c.grade }}</td>
+      <td>{{ c.class_name }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="5">登録されているクラスがありません。</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a href="{% url 'home' %}">ホームへ戻る</a>

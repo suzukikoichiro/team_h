@@ -6,6 +6,10 @@
 <p>ユーザーID: <strong>{{ request.session.login_user_id }}</strong></p>
 <p>氏名: <strong>{{ request.session.user_name }}</strong></p>
 <a href="{% url 'user_logout' %}">ログアウト</a>
+<br />
+<a href="{% url 'class_list' %}">クラス管理</a>
+<a href="{% url 'teacher_list' %}">教職員管理</a>
+
 {% else %}
 <p>まだユーザーログインしていません。</p>
 <a href="{% url 'user_login' %}">ユーザーログインへ</a>
