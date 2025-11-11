@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>クラス情報編集</title>
+  </head>
+  <body class="bg-light">
+    <div class="container mt-4">
+      <h2 class="mb-4">クラス情報の編集 - {{ class_obj.class_name }}</h2>
+      {% comment %} <button id="delete-class-btn">削除</button>
+
+      <script>
+        document
+          .getElementById("delete-class-btn")
+          .addEventListener("click", function () {
+            if (confirm("本当に {{ class_obj.class_name }} を削除しますか？")) {
+              fetch("{% url 'class_delete' class_obj.class_id %}", {
+                method: "POST",
+                headers: {
+                  "X-CSRFToken": "{{ csrf_token }}",
+                  "Content-Type": "application/json",
+                },
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  alert(data.message);
+                  window.location.href = "{% url 'class_list' %}"; // 削除後に一覧ページへ
+                });
+            }
+          });
+      </script>
+      {% endcomment %}
+      <form method="POST" class="card p-4 shadow-sm bg-white">
+        {% csrf_token %} {{ form.as_p }}
+        <div class="mt-3">
+          <button type="submit" class="btn btn-primary">保存</button>
+          <a href="{% url 'class_list' %}" class="btn btn-secondary">戻る</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

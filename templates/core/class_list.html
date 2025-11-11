@@ -6,6 +6,7 @@
       <th>クラスID</th>
       <th>学年</th>
       <th>クラス名</th>
+      <th>編集</th>
     </tr>
   </thead>
   <tbody>
@@ -14,6 +15,11 @@
       <td>{{ c.class_id }}</td>
       <td>{{ c.grade }}</td>
       <td>{{ c.class_name }}</td>
+      <td>
+        <a href="{% url 'class_edit' c.pk %}" class="btn btn-sm btn-primary"
+          >編集</a
+        >
+      </td>
     </tr>
     {% empty %}
     <tr>

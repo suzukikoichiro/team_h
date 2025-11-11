@@ -1,18 +1,61 @@
-from django.shortcuts import render, redirect
-from .forms import SchoolLoginForm, SchoolRegisterForm, AdministratorRegisterForm, UserLoginForm, ClassForm, TeacherRegisterForm
-from .models import School, AdministratorUser, Class, TeacherUser
-from django.http import HttpResponse
-from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from functools import wraps
 import json
 
+from django.contrib.auth.hashers import make_password, check_password
+
+from .forms import (
+    SchoolLoginForm, SchoolRegisterForm, AdministratorRegisterForm,
+    UserLoginForm, ClassForm, TeacherRegisterForm
+)
+from .models import School, AdministratorUser, TeacherUser, Class
+
+
+
+#デコレイト、真っすぐだね
+def admin_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if request.session.get('user_position') != 0:
+            messages.error(request, 'このページには管理者のみアクセスできます。')
+            return redirect('home')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+#認証するやつ
+def authenticate_user(user_id, password, school_id):
+    for model in [AdministratorUser, TeacherUser]:
+        try:
+            user = model.objects.get(user_id=user_id, school_id=school_id)
+            if check_password(password, user.user_password):
+                return user
+        except model.DoesNotExist:
+            continue
+    return None
+
+
+#クラス取得
+def get_school_class(school_id, class_id):
+    return get_object_or_404(Class, class_id=class_id, school_id=school_id)
+
+
+#管理者はログイン後こちらに遷移
 def home(request):
     return render(request, 'core/home.html')
 
 
-def school_login(request): # 学校ログイン
+#管理者以外はログイン後こちらに遷移
+def test(request):
+    return render(request, 'core/test.html')
+
+
+#学校ログイン
+def school_login(request):
     message = None
     if request.method == "POST":
         form = SchoolLoginForm(request.POST)
@@ -20,11 +63,13 @@ def school_login(request): # 学校ログイン
             school_id = form.cleaned_data['school_id']
             school_password = form.cleaned_data['school_password']
             try:
-                school = School.objects.get(school_id=school_id, school_password=school_password)
-                # ログイン成功 → セッションに保存
-                request.session['school_id'] = school.id
-                request.session['school_name'] = school.school_name
-                return redirect('user_login')
+                school = School.objects.get(school_id=school_id)
+                if check_password(school_password, school.school_password):
+                    request.session['school_id'] = school.id
+                    request.session['school_name'] = school.school_name
+                    return redirect('user_login')
+                else:
+                    message = "学校IDまたはパスワードが間違っています。"
             except School.DoesNotExist:
                 message = "学校IDまたはパスワードが間違っています。"
     else:
@@ -32,67 +77,63 @@ def school_login(request): # 学校ログイン
     return render(request, 'core/school_login.html', {'form': form, 'message': message})
 
 
-def school_logout(request): # ログアウト
-    request.session.flush()  # セッション全消去
+#学校ログアウト
+def school_logout(request):
+    request.session.flush()
     return redirect('school_login')
 
 
+#ユーザーログイン
 def user_login(request):
-    message = ""
     school_id = request.session.get('school_id')
     if not school_id:
-        # 学校がログインされていなければ学校ログイン画面へリダイレクト
         return redirect('school_login')
-    
+
+    message = ""
     if request.method == "POST":
         form = UserLoginForm(request.POST)
         if form.is_valid():
             user_id = form.cleaned_data['user_id']
             password = form.cleaned_data['user_password']
-            try:
-                user = AdministratorUser.objects.get(user_id=user_id, school_id=school_id)
-                if user.user_password == password:  # ハッシュ化していなければ平文比較
-                    # ログイン成功処理
-                    request.session['login_user_id'] = user.user_id
-                    request.session['user_name'] = user.user_name
-                    request.session['user_position'] = user.user_position
-                    return redirect('home')
-                else:
-                    message = "IDまたはパスワードが間違っています"
-            except AdministratorUser.DoesNotExist:
+
+            user = authenticate_user(user_id, password, school_id)
+            if user:
+                request.session['login_user_id'] = user.user_id
+                request.session['user_position'] = user.user_position
+                return redirect('home') if user.user_position == 0 else redirect('test')
+            else:
                 message = "IDまたはパスワードが間違っています"
     else:
         form = UserLoginForm()
+
     return render(request, 'core/user_login.html', {'form': form, 'message': message})
 
 
+#ユーザーログアウト
 def user_logout(request):
-    request.session.pop('user_id', None)
-    request.session.pop('user_name', None)
-    request.session.pop('login_user_id', None)
-    request.session.flush()  # セッション全消去
+    request.session.flush()
     return redirect('school_login')
 
 
+
+#学校登録
 def school_register(request):
     if request.method == 'POST':
         school_form = SchoolRegisterForm(request.POST)
         user_form = AdministratorRegisterForm(request.POST)
 
         if school_form.is_valid() and user_form.is_valid():
-            # 学校を保存
-            school = school_form.save()
+            school = school_form.save(commit=False)
+            school.school_password = make_password(school_form.cleaned_data['school_password'])
+            school.save()
 
-            # 管理者ユーザーを保存（学校に紐づけ）
             user = user_form.save(commit=False)
             user.school = school
+            user.user_password = make_password(user_form.cleaned_data['user_password'])
             user.save()
 
-            return render(request, 'core/school_register.html', {
-                'school_form': SchoolRegisterForm(),
-                'user_form': AdministratorRegisterForm(),
-                'register_success': True,
-            })
+            messages.success(request, '学校登録が完了しました。')
+            return redirect('school_login')
     else:
         school_form = SchoolRegisterForm()
         user_form = AdministratorRegisterForm()
@@ -103,77 +144,120 @@ def school_register(request):
     })
 
 
+#クラス登録
+@admin_required
 def class_create(request):
-    if request.session.get('user_position') != 0:
-        messages.error(request, 'このページには管理者のみアクセスできます。')
-        return redirect('home')
-
     if request.method == 'POST':
         form = ClassForm(request.POST)
         if form.is_valid():
             new_class = form.save(commit=False)
-            # ログイン中ユーザーの学校IDを設定
             new_class.school_id = request.session.get('school_id')
             new_class.save()
             messages.success(request, 'クラスを登録しました。')
             return redirect('class_list')
     else:
         form = ClassForm()
-
     return render(request, 'core/class_create.html', {'form': form})
 
 
+#クラス一覧
+@admin_required
 def class_list(request):
-    # 管理者チェック
-    if request.session.get('user_position') != 0:
-        messages.error(request, 'このページには管理者のみアクセスできます。')
-        return redirect('home')
-
     school_id = request.session.get('school_id')
     classes = Class.objects.filter(school_id=school_id).order_by('class_id')
     return render(request, 'core/class_list.html', {'classes': classes})
 
 
-def teacher_register(request):
+#クラス情報更新
+@admin_required
+def class_edit(request, class_id):
+    school_id = request.session.get('school_id')
+    c = get_school_class(school_id, class_id)
     if request.method == 'POST':
-        school_id = request.session.get('school_id')
+        form = ClassForm(request.POST, instance=c)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'クラス情報を更新しました。')
+            return redirect('class_list')
+    else:
+        form = ClassForm(instance=c)
+    return render(request, 'core/class_edit.html', {'form': form, 'class_obj': c})
+
+
+#クラス削除 *現在、class_edit.htmlの方で削除ボタンを無効化中
+@admin_required
+@require_POST
+def class_delete(request, class_id):
+    school_id = request.session.get('school_id')
+    c = get_school_class(school_id, class_id)
+    c.delete()
+    return JsonResponse({'success': True, 'message': f'{c.class_name} を削除しました。'})
+
+
+#教師登録
+def teacher_register(request):
+    school_id = request.session.get('school_id')
+    if request.method == 'POST':
         form = TeacherRegisterForm(request.POST, school_id=school_id)
         if form.is_valid():
             school = School.objects.filter(id=school_id).first()
-            if school is None:
+            if not school:
                 return render(request, 'core/teacher_register.html', {
                     'form': form,
-                    'error': '学校情報が見つかりません（ログイン情報を確認してください）。',
+                    'error': '学校情報が見つかりません。',
                 })
-
             teacher = form.save(commit=False)
             teacher.school = school
+            teacher.user_password = make_password(form.cleaned_data['user_password'])
             teacher.save()
             form.save_m2m()
+            messages.success(request, '教職員を登録しました。')
             return redirect('teacher_list')
     else:
-        school_id = request.session.get('school_id')
         form = TeacherRegisterForm(school_id=school_id)
-
     return render(request, 'core/teacher_register.html', {'form': form})
 
 
-
-
-def teacher_register_done(request):
-    return render(request, 'core/teacher_done.html')
-
-
+#教師一覧
 def teacher_list(request):
-    school_id = school_id = request.session.get('school_id')
+    school_id = request.session.get('school_id')
     teachers = TeacherUser.objects.select_related('school').prefetch_related('classes').filter(school_id=school_id)
     return render(request, 'core/teacher_list.html', {'teachers': teachers})
 
 
-@csrf_exempt  # CSRFチェックを無効化（API用途）
+#教師情報更新
+def teacher_edit(request, teacher_id):
+    school_id = request.session.get('school_id')
+    teacher = get_object_or_404(TeacherUser, id=teacher_id, school_id=school_id)
+
+    if request.method == 'POST':
+        form = TeacherRegisterForm(request.POST, instance=teacher, school_id=school_id)
+        if form.is_valid():
+            teacher.user_password = make_password(form.cleaned_data['user_password'])
+            form.save(commit=True)
+            messages.success(request, '教職員情報を更新しました。')
+            return redirect('teacher_list')
+    else:
+        form = TeacherRegisterForm(instance=teacher, school_id=school_id)
+
+    return render(request, 'core/teacher_edit.html', {'form': form, 'teacher': teacher})
+
+
+#教師削除
+@require_POST
+def teacher_delete(request, teacher_id):
+    teacher = get_object_or_404(TeacherUser, id=teacher_id)
+    teacher.delete()
+    return JsonResponse({'success': True, 'message': f'{teacher.name} を削除しました。'})
+
+
+# API 用
+@csrf_exempt
 def receive_form(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        print("受信データ:", data)
-        return JsonResponse({"status": "ok", "received": data})
+        try:
+            data = json.loads(request.body)
+            return JsonResponse({"status": "ok", "received": data})
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "JSON decode error"}, status=400)
     return JsonResponse({"error": "invalid method"}, status=405)

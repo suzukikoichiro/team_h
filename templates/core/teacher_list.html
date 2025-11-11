@@ -18,6 +18,7 @@
           <th>生年月日</th>
           <th>所属学校</th>
           <th>所属クラス</th>
+          <th>情報編集</th>
         </tr>
       </thead>
       <tbody>
@@ -35,6 +36,9 @@
             {% empty %}
               -
             {% endfor %}
+          </td>
+          <td>
+            <a href="{% url 'teacher_edit' teacher.id %}" class="btn btn-sm btn-primary">編集</a>
           </td>
         </tr>
         {% endfor %}
