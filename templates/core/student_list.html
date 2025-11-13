@@ -2,12 +2,11 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>教職員一覧</title>
+  <title>学生一覧</title>
 <body class="bg-light">
   <div class="container mt-4">
-    <h2 class="mb-4">教職員一覧</h2>
-<a href="{% url 'teacher_register' %}">新しい教職員を登録</a><br />
-    {% if teachers %}
+    <h2 class="mb-4">学生一覧</h2>
+    {% if students %}
     <table class="table table-bordered table-striped shadow-sm">
       <thead class="table-primary">
         <tr>
@@ -22,30 +21,28 @@
         </tr>
       </thead>
       <tbody>
-        {% for teacher in teachers %}
+        {% for student in students %}
         <tr>
-          <td>{{ teacher.user_id }}</td>
-          <td>{{ teacher.user_name }}</td>
-          <td>{{ teacher.user_spell }}</td>
-          <td>{{ teacher.get_gender_display }}</td>
-          <td>{{ teacher.birthdate }}</td>
-          <td>{{ teacher.school.school_name }}</td>
+          <td>{{ student.user_id }}</td>
+          <td>{{ student.user_name }}</td>
+          <td>{{ student.user_spell }}</td>
+          <td>{{ student.get_gender_display }}</td>
+          <td>{{ student.birthdate }}</td>
+          <td>{{ student.school.school_name }}</td>
           <td>
-            {% for c in teacher.classes.all %}
+            {% for c in student.classes.all %}
               {{ c.class_name }}{% if not forloop.last %}, {% endif %}
             {% empty %}
               -
             {% endfor %}
           </td>
-          <td>
-            <a href="{% url 'teacher_edit' teacher.id %}" class="btn btn-sm btn-primary">編集</a>
-          </td>
+
         </tr>
         {% endfor %}
       </tbody>
     </table>
     {% else %}
-      <div class="alert alert-warning">登録されている教職員はいません。</div>
+      <div class="alert alert-warning">登録されている学生はいません。</div>
     {% endif %}
 
     <div class="mt-3">

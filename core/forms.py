@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import School, AdministratorUser, TeacherUser, Class
+from .models import School, AdministratorUser, TeacherUser, StudentUser, Class
 
 
 class PasswordInputWidget(forms.PasswordInput):
@@ -86,13 +86,13 @@ class TeacherRegisterForm(BaseUserRegisterForm):
 
     class Meta:
         model = TeacherUser
-        fields = ['user_id','user_name','user_spell','gendar','birthdate','user_password','classes']
+        fields = ['user_id','user_name','user_spell','gender','birthdate','user_password','classes']
         widgets = {'birthdate': forms.DateInput(attrs={'type': 'date'})}
         labels = {
             'user_id': 'ユーザーID',
             'user_name': '氏名',
             'user_spell': '氏名（ふりがな）',
-            'gendar': '性別',
+            'gender': '性別',
             'birthdate': '生年月日',
             'user_password': '職員パスワード',
             'classes': '所属クラス',
@@ -117,6 +117,52 @@ class TeacherRegisterForm(BaseUserRegisterForm):
         if self.school_id and TeacherUser.objects.filter(user_id=user_id, school_id=self.school_id).exclude(pk=getattr(self.instance, 'pk', None)).exists():
             raise ValidationError("このユーザーIDはすでに登録されています。")
         if AdministratorUser.objects.filter(user_id=user_id).exists():
+            raise ValidationError("このユーザーIDはすでに登録されています。")
+        return user_id
+
+
+# forms.py
+class StudentRegisterForm(BaseUserRegisterForm):
+    classes = forms.ModelMultipleChoiceField(
+        queryset=Class.objects.none(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label="所属クラス"
+    )
+
+    class Meta:
+        model = StudentUser
+        fields = ['user_id', 'user_name', 'user_spell', 'gender', 'birthdate', 'user_password', 'classes']
+        widgets = {'birthdate': forms.DateInput(attrs={'type': 'date'})}
+        labels = {
+            'user_id': 'ユーザーID',
+            'user_name': '氏名',
+            'user_spell': '氏名（ふりがな）',
+            'gender': '性別',
+            'birthdate': '生年月日',
+            'user_password': '生徒パスワード',
+            'classes': '所属クラス',
+        }
+
+    user_position = 2  # 生徒
+
+    def __init__(self, *args, **kwargs):
+        self.school_id = kwargs.pop('school_id', None)
+        super().__init__(*args, **kwargs)
+        if self.school_id:
+            self.fields['classes'].queryset = Class.objects.filter(school_id=self.school_id)
+        if self.instance and self.instance.pk:
+            self.fields['user_id'].disabled = True
+
+    def clean_user_id(self):
+        user_id = self.cleaned_data.get('user_id')
+        if self.instance and self.instance.pk:
+            return self.instance.user_id
+        if not user_id:
+            return user_id
+        if self.school_id and StudentUser.objects.filter(user_id=user_id, school_id=self.school_id).exclude(pk=getattr(self.instance, 'pk', None)).exists():
+            raise ValidationError("このユーザーIDはすでに登録されています。")
+        if TeacherUser.objects.filter(user_id=user_id).exists() or AdministratorUser.objects.filter(user_id=user_id).exists():
             raise ValidationError("このユーザーIDはすでに登録されています。")
         return user_id
 

@@ -7,25 +7,19 @@
   <body>
     <h1>教職員登録</h1>
     <form method="post">
-      {% csrf_token %}
-      <p>{{ form.user_id.label_tag }} {{ form.user_id }}</p>
-      <p>{{ form.user_name.label_tag }} {{ form.user_name }}</p>
-      <p>{{ form.user_spell.label_tag }} {{ form.user_spell }}</p>
-      <p>{{ form.gendar.label_tag }} {{ form.gendar }}</p>
-      <p>{{ form.birthdate.label_tag }} {{ form.birthdate }}</p>
-      <p>{{ form.user_password.label_tag }} {{ form.user_password }}</p>
-
+      {% csrf_token %} {% for field in form %}
       <div>
-        <label>{{ form.classes.label }}</label>
-        <div class="checkbox-group">{{ form.classes }}</div>
+        {{ field.label_tag }} {{ field }} {% if field.errors %}
+        <div class="error">{{ field.errors|striptags }}</div>
+        {% endif %}
       </div>
+      {% endfor %}
 
       <button type="submit">登録</button>
     </form>
-    {% if form.errors %}
-    <div style="color: red">{{ form.errors }}</div>
-    {% endif %} {% if error %}
-    <div style="color: red">{{ error }}</div>
+
+    {% if form.non_field_errors %}
+    <div class="error">{{ form.non_field_errors }}</div>
     {% endif %}
 
     <a href="{% url 'home' %}">ホームへ戻る</a>

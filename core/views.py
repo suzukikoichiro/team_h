@@ -4,16 +4,17 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from functools import wraps
-import json
+import json, datetime
 
 from django.contrib.auth.hashers import make_password, check_password
 
 from .forms import (
     SchoolLoginForm, SchoolRegisterForm, AdministratorRegisterForm,
-    UserLoginForm, ClassForm, TeacherRegisterForm
+    UserLoginForm, ClassForm, TeacherRegisterForm, StudentRegisterForm
 )
-from .models import School, AdministratorUser, TeacherUser, Class
-
+from .models import (
+    School, AdministratorUser, TeacherUser, StudentUser, Class
+)
 
 
 #デコレイト、真っすぐだね
@@ -248,16 +249,69 @@ def teacher_edit(request, teacher_id):
 def teacher_delete(request, teacher_id):
     teacher = get_object_or_404(TeacherUser, id=teacher_id)
     teacher.delete()
-    return JsonResponse({'success': True, 'message': f'{teacher.name} を削除しました。'})
+    return JsonResponse({'success': True, 'message': f'{teacher.user_name} を削除しました。'})
 
 
-# API 用
+#学生登録
 @csrf_exempt
 def receive_form(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            return JsonResponse({"status": "ok", "received": data})
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "JSON decode error"}, status=400)
-    return JsonResponse({"error": "invalid method"}, status=405)
+    print("receive_form called")
+    if request.method != "POST":
+        return JsonResponse({"error": "invalid method"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "JSON decode error"}, status=400)
+
+    print("受信データ:", data)
+
+    # 学校はとりあえず先頭を使用
+    school = School.objects.first()
+    print("使用学校:", school)
+
+    # 性別変換
+    gender_map = {"男性": 0, "女性": 1, "その他": 2}
+
+    # 生年月日
+    try:
+        birthdate = datetime.datetime.strptime(data.get("birthdate", ""), "%Y-%m-%d").date()
+    except Exception:
+        birthdate = datetime.date(2000, 1, 1)
+
+    form_data = {
+        "user_id": data.get("user_id"),
+        "user_name": data.get("user_name"),
+        "user_spell": data.get("user_spell"),
+        "gender": gender_map.get(data.get("gender"), 2),
+        "birthdate": birthdate,
+        "user_password": data.get("user_password"),  # ← フィールド名をフォームに合わせる
+    }
+    print("フォームデータ:", form_data)
+
+    # クラス取得
+    class_names = data.get("classes", [])
+    class_qs = Class.objects.filter(class_name__in=class_names, school=school)
+    print("クラス取得:", list(class_qs.values_list("class_name", flat=True)))
+
+    form = StudentRegisterForm(form_data)  # school_id は渡さない
+    print("フォーム初期化完了")
+
+    if form.is_valid():
+        print("フォーム valid")
+        student = form.save(commit=False)
+        student.school = school
+        student.save()
+        student.classes.set(class_qs)
+        form.save_m2m()
+        print("Student saved:", student.id, student.user_name, list(student.classes.all()))
+        return JsonResponse({"status": "ok", "message": "登録完了"})
+    else:
+        print("フォームエラー:", form.errors)
+        return JsonResponse({"status": "error", "errors": form.errors}, status=400)
+
+
+#学生一覧
+def student_list(request):
+    students = StudentUser.objects.select_related('school').prefetch_related('classes').all()
+    return render(request, 'core/student_list.html', {'students': students})

@@ -23,5 +23,6 @@ urlpatterns = [
     path('teachers/<int:teacher_id>/edit/', views.teacher_edit, name='teacher_edit'),
     path('teachers/<int:teacher_id>/delete/', views.teacher_delete, name='teacher_delete'),
 
+    path('student/list/', views.student_list, name='student_list'), 
     path("api/receive_form/", views.receive_form, name="receive_form"),
 ]

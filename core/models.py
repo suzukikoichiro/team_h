@@ -35,7 +35,7 @@ class BaseUser(models.Model):
     user_id = models.IntegerField()
     user_name = models.CharField(max_length=50)
     user_spell = models.CharField(max_length=50, default="")
-    gendar = models.IntegerField(choices=GENDAR_CHOICES, default=0)
+    gender = models.IntegerField(choices=GENDAR_CHOICES, default=0)
     birthdate = models.DateField()
     user_password = models.CharField(max_length=20)
     user_position = models.IntegerField()
@@ -64,3 +64,11 @@ class AdministratorUser(models.Model):
 
 class TeacherUser(BaseUser):
     classes = models.ManyToManyField(Class, blank=True, related_name='teachers')
+
+
+class StudentUser(BaseUser):
+    classes = models.ManyToManyField(Class, blank=True, related_name='students')
+
+    class Meta:
+        verbose_name = "生徒"
+        verbose_name_plural = "生徒"
