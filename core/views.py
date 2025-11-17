@@ -55,6 +55,11 @@ def test(request):
     return render(request, 'core/test.html')
 
 
+#管理者以外は仮godot君へ
+def godot(request):
+    return render(request, 'godot/godot.html')
+
+
 #学校ログイン
 def school_login(request):
     message = None
@@ -101,7 +106,7 @@ def user_login(request):
             if user:
                 request.session['login_user_id'] = user.user_id
                 request.session['user_position'] = user.user_position
-                return redirect('home') if user.user_position == 0 else redirect('test')
+                return redirect('home') if user.user_position == 0 else redirect('godot')
             else:
                 message = "IDまたはパスワードが間違っています"
     else:
@@ -255,7 +260,6 @@ def teacher_delete(request, teacher_id):
 #学生登録
 @csrf_exempt
 def receive_form(request):
-    print("receive_form called")
     if request.method != "POST":
         return JsonResponse({"error": "invalid method"}, status=405)
 
@@ -266,9 +270,14 @@ def receive_form(request):
 
     print("受信データ:", data)
 
-    # 学校はとりあえず先頭を使用
-    school = School.objects.first()
-    print("使用学校:", school)
+    school_id = data.get("school_id")
+    if not school_id:
+        return JsonResponse({"error": "school_id missing"}, status=400)
+
+    try:
+        school = School.objects.get(id=school_id)
+    except School.DoesNotExist:
+        return JsonResponse({"error": "invalid school_id"}, status=400)
 
     # 性別変換
     gender_map = {"男性": 0, "女性": 1, "その他": 2}
@@ -290,28 +299,51 @@ def receive_form(request):
     print("フォームデータ:", form_data)
 
     # クラス取得
-    class_names = data.get("classes", [])
-    class_qs = Class.objects.filter(class_name__in=class_names, school=school)
-    print("クラス取得:", list(class_qs.values_list("class_name", flat=True)))
+    class_ids = data.get("class_ids", [])
+    class_qs = Class.objects.filter(class_id__in=class_ids, school=school)
 
-    form = StudentRegisterForm(form_data)  # school_id は渡さない
-    print("フォーム初期化完了")
+    form = StudentRegisterForm(form_data)
 
     if form.is_valid():
-        print("フォーム valid")
         student = form.save(commit=False)
         student.school = school
         student.save()
         student.classes.set(class_qs)
         form.save_m2m()
-        print("Student saved:", student.id, student.user_name, list(student.classes.all()))
         return JsonResponse({"status": "ok", "message": "登録完了"})
     else:
-        print("フォームエラー:", form.errors)
         return JsonResponse({"status": "error", "errors": form.errors}, status=400)
+
+
+
+#クラス渡すメン
+@csrf_exempt
+def get_classes(request):
+    school_id = request.GET.get("school_id")
+
+    if not school_id:
+        return JsonResponse({"classes": []})
+
+    classes = Class.objects.filter(school_id=school_id).order_by("grade", "class_id")
+
+    class_data = []
+    for c in classes:
+        class_data.append({
+            "id": c.class_id,
+            "label": f"{c.grade}年 {c.class_name}",
+        })
+
+    return JsonResponse({"classes": class_data})
 
 
 #学生一覧
 def student_list(request):
     students = StudentUser.objects.select_related('school').prefetch_related('classes').all()
     return render(request, 'core/student_list.html', {'students': students})
+
+
+def godot_page(request):
+    school_id = request.session.get("school_id")
+    return render(request, "godot.html", {
+        "school_id": school_id
+    })

@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.school_login, name='school_login'),
     path('home', views.home, name='home'),
     path('test', views.test, name='test'),
+    path('godot', views.godot, name='godot'),
 
     path('school/register/', views.school_register, name='school_register'),
     path('school/login/', views.school_login, name='school_login'),
@@ -25,4 +26,5 @@ urlpatterns = [
 
     path('student/list/', views.student_list, name='student_list'), 
     path("api/receive_form/", views.receive_form, name="receive_form"),
+    path("api/get_classes/", views.get_classes, name="get_classes"),
 ]
