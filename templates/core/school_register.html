@@ -1,3 +1,13 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
 <h2>学校・管理者 新規登録</h2>
 
 <form method="post" novalidate>
@@ -13,7 +23,9 @@
   </fieldset>
 
   <button type="submit" style="margin-top: 20px">登録</button>
+  <div class="mt-3">
   <a href="{% url 'school_login' %}">戻る</a>
+  </div>
 </form>
 
 <!-- モーダルウィンdow -->
@@ -51,3 +63,6 @@
     }, 800);
   {% endif %}
 </script>
+
+</body>
+</html>

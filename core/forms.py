@@ -153,18 +153,31 @@ class StudentRegisterForm(BaseUserRegisterForm):
             self.fields['classes'].queryset = Class.objects.filter(school_id=self.school_id)
         if self.instance and self.instance.pk:
             self.fields['user_id'].disabled = True
-
+            
     def clean_user_id(self):
         user_id = self.cleaned_data.get('user_id')
-        if self.instance and self.instance.pk:
-            return self.instance.user_id
-        if not user_id:
-            return user_id
-        if self.school_id and StudentUser.objects.filter(user_id=user_id, school_id=self.school_id).exclude(pk=getattr(self.instance, 'pk', None)).exists():
+
+        if user_id is None:
+            raise ValidationError("ユーザーIDを入力してください。")
+
+        user_id = str(user_id)
+
+        if not user_id.isdigit():
+            raise ValidationError("ユーザーIDは数字のみ使用できます。")
+
+        if (
+            self.school_id and
+            StudentUser.objects.filter(user_id=user_id, school_id=self.school_id).exists()
+        ):
             raise ValidationError("このユーザーIDはすでに登録されています。")
+
         if TeacherUser.objects.filter(user_id=user_id).exists() or AdministratorUser.objects.filter(user_id=user_id).exists():
             raise ValidationError("このユーザーIDはすでに登録されています。")
+
         return user_id
+
+
+
 
 
 #クラス

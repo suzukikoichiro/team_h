@@ -1,16 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
 <h2>ホーム画面</h2>
 
+<div class="info-box">
 {% if request.session.school_name %}
 <p>学校: <strong>{{ request.session.school_name }}</strong></p>
 {% endif %} {% if request.session.login_user_id %}
 <p>ユーザーID: <strong>{{ request.session.login_user_id }}</strong></p>
-<a href="{% url 'user_logout' %}">ログアウト</a>
-<br />
+</div>
+
+<div class="link-group">
 <a href="{% url 'class_list' %}">クラス管理</a>
 <a href="{% url 'teacher_list' %}">教職員管理</a>
 <a href="{% url 'student_list' %}">学生管理</a>
-
+<a href="{% url 'user_logout' %}">ログアウト</a>
+</div>
 {% else %}
 <p>まだユーザーログインしていません。</p>
 <a href="{% url 'user_login' %}">ユーザーログインへ</a>
 {% endif %}
+
+</body>
+</html>

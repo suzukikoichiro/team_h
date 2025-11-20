@@ -17,7 +17,6 @@ from .models import (
 )
 
 
-#デコレイト、真っすぐだね
 def admin_required(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
@@ -30,7 +29,7 @@ def admin_required(view_func):
 
 #認証するやつ
 def authenticate_user(user_id, password, school_id):
-    for model in [AdministratorUser, TeacherUser]:
+    for model in [AdministratorUser, TeacherUser, StudentUser]:
         try:
             user = model.objects.get(user_id=user_id, school_id=school_id)
             if check_password(password, user.user_password):
@@ -104,9 +103,18 @@ def user_login(request):
 
             user = authenticate_user(user_id, password, school_id)
             if user:
+                # ログイン成功後、セッションに必要な情報を保存
                 request.session['login_user_id'] = user.user_id
                 request.session['user_position'] = user.user_position
-                return redirect('home') if user.user_position == 0 else redirect('godot')
+
+                # ユーザーポジションに応じてリダイレクト先を変更
+                if user.user_position == 0:
+                    return redirect('home')  # 生徒ならhomeページに
+                elif user.user_position == 1:
+                    return redirect('godot')  # 教員ならgodotページに
+                elif user.user_position == 2:
+                    return redirect('test')
+
             else:
                 message = "IDまたはパスワードが間違っています"
     else:
@@ -190,7 +198,7 @@ def class_edit(request, class_id):
     return render(request, 'core/class_edit.html', {'form': form, 'class_obj': c})
 
 
-#クラス削除 *現在、class_edit.htmlの方で削除ボタンを無効化中
+#クラス削除
 @admin_required
 @require_POST
 def class_delete(request, class_id):
@@ -257,62 +265,93 @@ def teacher_delete(request, teacher_id):
     return JsonResponse({'success': True, 'message': f'{teacher.user_name} を削除しました。'})
 
 
-#学生登録
+#管理者による学生登録
+@admin_required
+def student_register(request):
+    school_id = request.session.get('school_id')
+    if not school_id:
+        return redirect('school_login')
+
+    if request.method == 'POST':
+        form = StudentRegisterForm(request.POST)
+        if form.is_valid():
+            student = form.save(commit=False)
+            student.school_id = school_id
+            student.user_password = make_password(form.cleaned_data['user_password'])
+            student.user_position = 2  #学生
+            student.save()
+            form.save_m2m()
+            messages.success(request, '学生を登録しました。')
+            return redirect('student_list')
+    else:
+        form = StudentRegisterForm()
+
+    return render(request, 'core/student_register.html', {'form': form})
+
+
+#教職員による学生登録
 @csrf_exempt
 def receive_form(request):
     if request.method != "POST":
-        return JsonResponse({"error": "invalid method"}, status=405)
+        return JsonResponse({"error": "POST メソッドで送信してください"}, status=405)
 
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
-        return JsonResponse({"error": "JSON decode error"}, status=400)
-
-    print("受信データ:", data)
+        return JsonResponse({"error": "JSON データが不正です"}, status=400)
 
     school_id = data.get("school_id")
     if not school_id:
-        return JsonResponse({"error": "school_id missing"}, status=400)
+        return JsonResponse({"error": "学校IDが送信されていません"}, status=400)
 
     try:
-        school = School.objects.get(id=school_id)
+        school = School.objects.get(school_id=school_id)
     except School.DoesNotExist:
-        return JsonResponse({"error": "invalid school_id"}, status=400)
+        return JsonResponse({"error": "存在しない学校IDです"}, status=400)
 
-    # 性別変換
+
     gender_map = {"男性": 0, "女性": 1, "その他": 2}
 
-    # 生年月日
     try:
-        birthdate = datetime.datetime.strptime(data.get("birthdate", ""), "%Y-%m-%d").date()
-    except Exception:
-        birthdate = datetime.date(2000, 1, 1)
-
+        birthdate_str = data.get("birthdate", "")
+        birthdate = datetime.datetime.strptime(birthdate_str, "%Y-%m-%d").date()
+    except ValueError:
+        return JsonResponse({
+            "status": "error",
+            "errors": {"birthdate": ["生年月日は YYYY-MM-DD 形式で入力してください"]}
+        }, status=400)
+    
     form_data = {
         "user_id": data.get("user_id"),
         "user_name": data.get("user_name"),
         "user_spell": data.get("user_spell"),
         "gender": gender_map.get(data.get("gender"), 2),
         "birthdate": birthdate,
-        "user_password": data.get("user_password"),  # ← フィールド名をフォームに合わせる
+        "user_password": data.get("user_password"),
+        "user_position": 2,
     }
-    print("フォームデータ:", form_data)
-
-    # クラス取得
-    class_ids = data.get("class_ids", [])
-    class_qs = Class.objects.filter(class_id__in=class_ids, school=school)
 
     form = StudentRegisterForm(form_data)
+    form.school_id = school.id
 
-    if form.is_valid():
-        student = form.save(commit=False)
-        student.school = school
-        student.save()
-        student.classes.set(class_qs)
-        form.save_m2m()
-        return JsonResponse({"status": "ok", "message": "登録完了"})
-    else:
-        return JsonResponse({"status": "error", "errors": form.errors}, status=400)
+    if not form.is_valid():
+        return JsonResponse({
+            "status": "error",
+            "errors": form.errors
+        }, status=400)
+
+    student = form.save(commit=False)
+    student.school = school
+    student.user_password = make_password(form.cleaned_data['user_password'])
+    student.save()
+
+    class_ids = data.get("class_ids", [])
+    class_ids = [int(i) for i in class_ids]
+    class_qs = Class.objects.filter(class_id__in=class_ids, school=school)
+    student.classes.set(class_qs)
+
+    return JsonResponse({"status": "ok", "message": "登録完了"})
+
 
 
 
@@ -338,12 +377,36 @@ def get_classes(request):
 
 #学生一覧
 def student_list(request):
-    students = StudentUser.objects.select_related('school').prefetch_related('classes').all()
+    school_id = request.session.get('school_id')
+    if not school_id:
+        return redirect('school_login')
+
+    students = StudentUser.objects.select_related('school').prefetch_related('classes').filter(school_id=school_id)
     return render(request, 'core/student_list.html', {'students': students})
 
 
-def godot_page(request):
-    school_id = request.session.get("school_id")
-    return render(request, "godot.html", {
-        "school_id": school_id
-    })
+# 学生情報編集
+@admin_required
+def student_edit(request, student_id):
+    school_id = request.session.get('school_id')
+    student = get_object_or_404(StudentUser, id=student_id, school_id=school_id)
+
+    if request.method == 'POST':
+        form = StudentRegisterForm(request.POST, instance=student, school_id=school_id)
+        if form.is_valid():
+            student.user_password = make_password(form.cleaned_data['user_password'])
+            form.save(commit=True)
+            messages.success(request, '学生情報を更新しました。')
+            return redirect('student_list')
+    else:
+        form = StudentRegisterForm(instance=student, school_id=school_id)
+
+    return render(request, 'core/student_edit.html', {'form': form, 'student': student})
+
+
+@admin_required
+@require_POST
+def student_delete(request, student_id):
+    student = get_object_or_404(StudentUser, id=student_id)
+    student.delete()
+    return JsonResponse({'success': True, 'message': f'{student.user_name} を削除しました。'})

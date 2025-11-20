@@ -1,3 +1,14 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>教職員登録</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  </head>
+
+  <body>
+
 <h2>ユーザーログイン</h2>
 {% if message %}
 <p style="color: red">{{ message }}</p>
@@ -6,5 +17,10 @@
 <form method="post">
   {% csrf_token %} {{ form.as_p }}
   <button type="submit">ログイン</button>
+  <div class="mt-3">
   <a href="{% url 'school_login' %}">戻る</a>
+  </div>
 </form>
+
+</body>
+</html>

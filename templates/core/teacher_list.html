@@ -1,8 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>教職員一覧</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
 <body class="bg-light">
   <div class="container mt-4">
     <h2 class="mb-4">教職員一覧</h2>
@@ -51,6 +53,6 @@
     <div class="mt-3">
       <a href="{% url 'home' %}" class="btn btn-secondary">ホームへ戻る</a>
     </div>
-  </div>
+    
 </body>
 </html>

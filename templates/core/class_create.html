@@ -1,3 +1,13 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
 <h2>クラス登録</h2>
 
 <form method="POST">
@@ -5,4 +15,9 @@
   <button type="submit">登録</button>
 </form>
 
+<div class="mt-3">
 <a href="{% url 'home' %}">ホームへ戻る</a>
+</div>
+
+</body>
+</html>

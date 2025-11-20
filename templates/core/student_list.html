@@ -1,11 +1,14 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>学生一覧</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
 <body class="bg-light">
   <div class="container mt-4">
     <h2 class="mb-4">学生一覧</h2>
+    <a href="{% url 'student_register' %}">新規学生登録</a>
     {% if students %}
     <table class="table table-bordered table-striped shadow-sm">
       <thead class="table-primary">
@@ -36,7 +39,9 @@
               -
             {% endfor %}
           </td>
-
+          <td>
+            <a href="{% url 'student_edit' student.id %}" class="btn btn-sm btn-primary">編集</a>
+          </td>
         </tr>
         {% endfor %}
       </tbody>

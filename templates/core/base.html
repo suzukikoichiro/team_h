@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}学校管理システム{% endblock %}</title>
+    <!-- CSSを読み込む -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body class="bg-light">
+    <header class="p-3 bg-primary text-white">
+      <h1>{% block header %}学校管理システム{% endblock %}</h1>
+      {% block nav %}{% endblock %}
+    </header>
+
+    <main class="container mt-4">{% block content %}{% endblock %}</main>
+
+    <footer class="text-center mt-5 p-3 bg-light">
+      <p>&copy; 2025 学校管理システム</p>
+    </footer>
+  </body>
+</html>

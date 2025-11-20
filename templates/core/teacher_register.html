@@ -1,8 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <title>教職員登録</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
   </head>
   <body>
     <h1>教職員登録</h1>
@@ -22,6 +24,8 @@
     <div class="error">{{ form.non_field_errors }}</div>
     {% endif %}
 
+    <div class="mt-3">
     <a href="{% url 'home' %}">ホームへ戻る</a>
+    </div>
   </body>
 </html>

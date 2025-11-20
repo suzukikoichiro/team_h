@@ -1,3 +1,13 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
 <h2>学校ログイン</h2>
 
 {% if message %}
@@ -9,4 +19,9 @@
   <button type="submit">ログイン</button>
 </form>
 
+<div class="mt-3">
 <a href="{% url 'school_register' %}">あなたも学校を創設</a>
+</div>
+  
+</body>
+</html>
