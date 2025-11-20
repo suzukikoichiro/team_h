@@ -58,14 +58,14 @@ class BaseUserRegisterForm(forms.ModelForm):
         return user
 
 
-#管理者登録
+#管理者
 class AdministratorRegisterForm(BaseUserRegisterForm):
     class Meta:
         model = AdministratorUser
         fields = ['user_id', 'user_password']
         labels = {'user_id': 'ユーザーID', 'user_password': '管理者パスワード'}
 
-    user_position = 0  # 管理者
+    user_position = 0  #管理者
 
     def save(self, commit=True, school=None):
         user = super().save(commit)
@@ -75,7 +75,7 @@ class AdministratorRegisterForm(BaseUserRegisterForm):
         return user
 
 
-#教師登録
+#教師
 class TeacherRegisterForm(BaseUserRegisterForm):
     classes = forms.ModelMultipleChoiceField(
         queryset=Class.objects.none(),
@@ -98,7 +98,7 @@ class TeacherRegisterForm(BaseUserRegisterForm):
             'classes': '所属クラス',
         }
 
-    user_position = 1  # 教職員
+    user_position = 1  #教職員
 
     def __init__(self, *args, **kwargs):
         self.school_id = kwargs.pop('school_id', None)
@@ -121,7 +121,7 @@ class TeacherRegisterForm(BaseUserRegisterForm):
         return user_id
 
 
-# forms.py
+#学生
 class StudentRegisterForm(BaseUserRegisterForm):
     classes = forms.ModelMultipleChoiceField(
         queryset=Class.objects.none(),
@@ -144,7 +144,7 @@ class StudentRegisterForm(BaseUserRegisterForm):
             'classes': '所属クラス',
         }
 
-    user_position = 2  # 生徒
+    user_position = 2  #学英
 
     def __init__(self, *args, **kwargs):
         self.school_id = kwargs.pop('school_id', None)
@@ -157,24 +157,20 @@ class StudentRegisterForm(BaseUserRegisterForm):
     def clean_user_id(self):
         user_id = self.cleaned_data.get('user_id')
 
-        if user_id is None:
+        if self.instance and self.instance.pk:
+            return self.instance.user_id
+
+        if not user_id:
             raise ValidationError("ユーザーIDを入力してください。")
 
-        user_id = str(user_id)
-
-        if not user_id.isdigit():
-            raise ValidationError("ユーザーIDは数字のみ使用できます。")
-
-        if (
-            self.school_id and
-            StudentUser.objects.filter(user_id=user_id, school_id=self.school_id).exists()
-        ):
+        if self.school_id and StudentUser.objects.filter(user_id=user_id, school_id=self.school_id).exists():
             raise ValidationError("このユーザーIDはすでに登録されています。")
 
         if TeacherUser.objects.filter(user_id=user_id).exists() or AdministratorUser.objects.filter(user_id=user_id).exists():
             raise ValidationError("このユーザーIDはすでに登録されています。")
 
         return user_id
+
 
 
 

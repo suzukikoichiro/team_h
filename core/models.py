@@ -1,5 +1,7 @@
 from django.db import models
 
+
+#学校
 class School(models.Model):
     school_id = models.CharField(max_length=20, unique=True)
     school_name = models.CharField(max_length=100)
@@ -10,6 +12,7 @@ class School(models.Model):
         return self.school_name
 
 
+#クラス
 class Class(models.Model):
     class_id = models.AutoField(primary_key=True, verbose_name='クラスID')
     school = models.ForeignKey(School, on_delete=models.CASCADE, verbose_name='学校')
@@ -25,6 +28,7 @@ class Class(models.Model):
         db_table = 'class'
 
 
+#共通ユーザー
 class BaseUser(models.Model):
     GENDAR_CHOICES = [
         (0, '男性'),
@@ -49,6 +53,7 @@ class BaseUser(models.Model):
         return f"{self.user_name} ({self.user_id}) - {self.school.school_name}"
 
 
+#管理者
 class AdministratorUser(models.Model):
         user_id = models.IntegerField()
         user_password = models.CharField(max_length=20)
@@ -62,13 +67,12 @@ class AdministratorUser(models.Model):
             return f"{self.user_id} - {self.school.school_name}"
 
 
+
+#教職員
 class TeacherUser(BaseUser):
     classes = models.ManyToManyField(Class, blank=True, related_name='teachers')
 
 
+#学生
 class StudentUser(BaseUser):
     classes = models.ManyToManyField(Class, blank=True, related_name='students')
-
-    class Meta:
-        verbose_name = "生徒"
-        verbose_name_plural = "生徒"

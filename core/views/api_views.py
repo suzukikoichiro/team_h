@@ -1,0 +1,90 @@
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from ..models import School, StudentUser, Class
+from ..forms import StudentRegisterForm
+from django.contrib.auth.hashers import make_password
+import datetime
+import json
+
+#教職員による学生登録
+@csrf_exempt
+def receive_form(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST メソッドで送信してください"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "JSON データが不正です"}, status=400)
+
+    school_id = data.get("school_id")
+    if not school_id:
+        return JsonResponse({"error": "学校IDが送信されていません"}, status=400)
+
+    try:
+        school = School.objects.get(school_id=school_id)
+    except School.DoesNotExist:
+        return JsonResponse({"error": "存在しない学校IDです"}, status=400)
+
+    gender_map = {"男性": 0, "女性": 1, "その他": 2}
+
+    try:
+        birthdate_str = data.get("birthdate", "")
+        birthdate = datetime.datetime.strptime(birthdate_str, "%Y-%m-%d").date()
+    except ValueError:
+        return JsonResponse({
+            "status": "error",
+            "errors": {"birthdate": ["生年月日は YYYY-MM-DD 形式で入力してください"]}
+        }, status=400)
+    
+    form_data = {
+        "user_id": data.get("user_id"),
+        "user_name": data.get("user_name"),
+        "user_spell": data.get("user_spell"),
+        "gender": gender_map.get(data.get("gender"), 2),
+        "birthdate": birthdate,
+        "user_password": data.get("user_password"),
+        "user_position": 2,
+    }
+
+    form = StudentRegisterForm(form_data)
+    form.school_id = school.id
+
+    if not form.is_valid():
+        return JsonResponse({
+            "status": "error",
+            "errors": form.errors
+        }, status=400)
+
+    student = form.save(commit=False)
+    student.school = school
+    student.user_password = make_password(form.cleaned_data['user_password'])
+    student.save()
+
+    class_ids = data.get("class_ids", [])
+    class_ids = [int(i) for i in class_ids]
+    class_qs = Class.objects.filter(class_id__in=class_ids, school=school)
+    student.classes.set(class_qs)
+
+    return JsonResponse({"status": "ok", "message": "登録完了"})
+
+
+#クラスチェックボックスのためにクラスを渡すメン
+@csrf_exempt
+def get_classes(request):
+    school_id = request.GET.get("school_id")
+
+    if not school_id:
+        return JsonResponse({"classes": []})
+
+    classes = Class.objects.filter(school_id=school_id).order_by("grade", "class_id")
+
+    class_data = []
+    for c in classes:
+        class_data.append({
+            "id": c.class_id,
+            "label": f"{c.grade}年 {c.class_name}",
+        })
+
+    return JsonResponse({"classes": class_data})
