@@ -65,5 +65,6 @@ def test(request):
 
 
 #管理者以外は仮godot君へ
+#更新の場合 return render(request, 'godot/godot.html', {"student_id": 3})
 def godot(request):
     return render(request, 'godot/godot.html')

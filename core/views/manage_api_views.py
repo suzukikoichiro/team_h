@@ -7,6 +7,53 @@ from django.contrib.auth.hashers import make_password
 import datetime
 import json
 
+
+#クラスチェックボックスのためにクラスを渡すメン
+@csrf_exempt
+def get_classes(request):
+    school_id = request.GET.get("school_id")
+
+    if not school_id:
+        return JsonResponse({"classes": []})
+
+    classes = Class.objects.filter(school_id=school_id).order_by("grade", "class_id")
+
+    class_data = []
+    for c in classes:
+        class_data.append({
+            "id": c.class_id,
+            "label": f"{c.grade}年 {c.class_name}",
+        })
+
+    return JsonResponse({"classes": class_data})
+
+
+# 学生情報取得（編集画面用）
+@csrf_exempt
+def get_student(request):
+    student_id = request.GET.get("student_id")
+    school_id = request.GET.get("school_id")
+
+    if not student_id or not school_id:
+        return JsonResponse({"error": "student_id と school_id が必要です"}, status=400)
+
+    try:
+        school = School.objects.get(school_id=school_id)
+        student = StudentUser.objects.get(user_id=student_id, school=school)
+    except (School.DoesNotExist, StudentUser.DoesNotExist):
+        return JsonResponse({"error": "対象の学生が見つかりません"}, status=404)
+
+    return JsonResponse({
+        "user_id": student.user_id,
+        "user_name": student.user_name,
+        "user_spell": student.user_spell,
+        "gender": student.gender,
+        "birthdate": student.birthdate.strftime("%Y-%m-%d"),
+        "user_password": "",
+        "class_ids": list(student.classes.values_list("class_id", flat=True)),
+    }, status=200)
+
+
 #教職員による学生登録
 @csrf_exempt
 def receive_form(request):
@@ -70,21 +117,44 @@ def receive_form(request):
     return JsonResponse({"status": "ok", "message": "登録完了"})
 
 
-#クラスチェックボックスのためにクラスを渡すメン
+#学生更新
 @csrf_exempt
-def get_classes(request):
-    school_id = request.GET.get("school_id")
+def update_student(request, student_id):
+    if request.method != "PUT":
+        return JsonResponse({"error": "PUT メソッドで送信してください"}, status=405)
 
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "JSON データが不正です"}, status=400)
+
+    school_id = data.get("school_id")
     if not school_id:
-        return JsonResponse({"classes": []})
+        return JsonResponse({"error": "school_id が必要です"}, status=400)
 
-    classes = Class.objects.filter(school_id=school_id).order_by("grade", "class_id")
+    try:
+        school = School.objects.get(school_id=school_id)
+        student = StudentUser.objects.get(user_id=student_id, school=school)
+    except (School.DoesNotExist, StudentUser.DoesNotExist):
+        return JsonResponse({"error": "対象の学生が見つかりません"}, status=404)
 
-    class_data = []
-    for c in classes:
-        class_data.append({
-            "id": c.class_id,
-            "label": f"{c.grade}年 {c.class_name}",
-        })
+    #入力値反映
+    student.user_name = data.get("user_name", student.user_name)
+    student.user_spell = data.get("user_spell", student.user_spell)
+    student.gender = int(data.get("gender", student.gender))
+    student.birthdate = datetime.datetime.strptime(data.get("birthdate"), "%Y-%m-%d").date()
 
-    return JsonResponse({"classes": class_data})
+    # パスワードが空でなければ更新
+    if data.get("user_password"):
+        student.user_password = make_password(data.get("user_password"))
+
+    student.save()
+
+    # クラス更新
+    class_ids = [int(c) for c in data.get("class_ids", [])]
+    class_qs = Class.objects.filter(class_id__in=class_ids, school=school)
+    student.classes.set(class_qs)
+
+    return JsonResponse({"message": "更新完了"}, status=200)
+
+

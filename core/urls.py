@@ -31,4 +31,6 @@ urlpatterns = [
     
     path("api/receive_form/", views.receive_form, name="receive_form"),
     path("api/get_classes/", views.get_classes, name="get_classes"),
+    path("api/get_student/", views.get_student, name="get_student"),
+    path("api/update_student/<int:student_id>/", views.update_student, name="update_student"),
 ]
