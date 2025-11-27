@@ -28,19 +28,33 @@ def get_classes(request):
     return JsonResponse({"classes": class_data})
 
 
-# 学生情報取得（編集画面用）
 @csrf_exempt
 def get_student(request):
     student_id = request.GET.get("student_id")
     school_id = request.GET.get("school_id")
 
-    if not student_id or not school_id:
-        return JsonResponse({"error": "student_id と school_id が必要です"}, status=400)
+    if not school_id:
+        return JsonResponse({"error": "school_id が必要です"}, status=400)
 
     try:
         school = School.objects.get(school_id=school_id)
-        student = StudentUser.objects.get(user_id=student_id, school=school)
-    except (School.DoesNotExist, StudentUser.DoesNotExist):
+    except School.DoesNotExist:
+        return JsonResponse({"error": "対象の学校が見つかりません"}, status=404)
+
+    # student_id が無効な場合 → 生徒データなし
+    if not student_id or student_id.lower() in ["null", "none", ""]:
+        return JsonResponse({"student": None}, status=200)
+
+    # student_id を整数に変換（不正なら 400 エラー）
+    try:
+        student_id_int = int(student_id)
+    except ValueError:
+        return JsonResponse({"error": "student_id が不正です"}, status=400)
+
+    # student_id がある場合のみ取得
+    try:
+        student = StudentUser.objects.get(user_id=student_id_int, school=school)
+    except StudentUser.DoesNotExist:
         return JsonResponse({"error": "対象の学生が見つかりません"}, status=404)
 
     return JsonResponse({
@@ -49,9 +63,12 @@ def get_student(request):
         "user_spell": student.user_spell,
         "gender": student.gender,
         "birthdate": student.birthdate.strftime("%Y-%m-%d"),
-        "user_password": "",
+        "user_password": "",  # セキュリティのため固定値
         "class_ids": list(student.classes.values_list("class_id", flat=True)),
     }, status=200)
+
+
+
 
 
 #教職員による学生登録

@@ -1,3 +1,5 @@
 __pycache__/
 *.pyc
 
+static/godot/
+templates/godot/

@@ -132,7 +132,6 @@
       window.STUDENT_ID = "{{ student_id|default:'null' }}";
       console.log("window.SCHOOL_ID:", window.SCHOOL_ID);
     </script>
-
     <script src="{% static 'godot/godot.js' %}"></script>
     <script>
       const GODOT_CONFIG = {
@@ -142,7 +141,7 @@
         ensureCrossOriginIsolationHeaders: true,
         executable: "{% static 'godot/godot' %}",
         experimentalVK: false,
-        fileSizes: { "godot.pck": 34877060, "godot.wasm": 36160334 },
+        fileSizes: { "godot.pck": 34877268, "godot.wasm": 36160334 },
         focusCanvas: true,
         gdextensionLibs: [],
         godotPoolSize: 4,

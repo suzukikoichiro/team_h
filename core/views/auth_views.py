@@ -33,6 +33,7 @@ def user_login(request):
             if user:
                 request.session['login_user_id'] = user.user_id
                 request.session['user_position'] = user.user_position
+                request.session['school_id'] = school_id
 
                 if user.user_position == 0:
                     return redirect('home')
@@ -59,12 +60,12 @@ def home(request):
     return render(request, 'core/home.html')
 
 
-#管理者以外はログイン後こちらに遷移
-def test(request):
-    return render(request, 'core/test.html')
-
-
-#管理者以外は仮godot君へ
+#教職員はログイン後こちらに遷移
 #更新の場合 return render(request, 'godot/godot.html', {"student_id": 3})
 def godot(request):
     return render(request, 'godot/godot.html')
+
+
+#学生はログイン後こちらに遷移
+def test(request):
+    return render(request, 'godot/godot.html', {"student_id": 4})
