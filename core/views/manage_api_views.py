@@ -28,6 +28,7 @@ def get_classes(request):
     return JsonResponse({"classes": class_data})
 
 
+#生徒情報取得
 @csrf_exempt
 def get_student(request):
     student_id = request.GET.get("student_id")
@@ -41,17 +42,14 @@ def get_student(request):
     except School.DoesNotExist:
         return JsonResponse({"error": "対象の学校が見つかりません"}, status=404)
 
-    # student_id が無効な場合 → 生徒データなし
     if not student_id or student_id.lower() in ["null", "none", ""]:
         return JsonResponse({"student": None}, status=200)
 
-    # student_id を整数に変換（不正なら 400 エラー）
     try:
         student_id_int = int(student_id)
     except ValueError:
         return JsonResponse({"error": "student_id が不正です"}, status=400)
 
-    # student_id がある場合のみ取得
     try:
         student = StudentUser.objects.get(user_id=student_id_int, school=school)
     except StudentUser.DoesNotExist:
@@ -63,7 +61,7 @@ def get_student(request):
         "user_spell": student.user_spell,
         "gender": student.gender,
         "birthdate": student.birthdate.strftime("%Y-%m-%d"),
-        "user_password": "",  # セキュリティのため固定値
+        "user_password": "",
         "class_ids": list(student.classes.values_list("class_id", flat=True)),
     }, status=200)
 
@@ -106,7 +104,7 @@ def receive_form(request):
         "user_id": data.get("user_id"),
         "user_name": data.get("user_name"),
         "user_spell": data.get("user_spell"),
-        "gender": gender_map.get(data.get("gender"), 2),
+        "gender": int(data.get("gender", 2)),
         "birthdate": birthdate,
         "user_password": data.get("user_password"),
         "user_position": 2,
@@ -161,13 +159,11 @@ def update_student(request, student_id):
     student.gender = int(data.get("gender", student.gender))
     student.birthdate = datetime.datetime.strptime(data.get("birthdate"), "%Y-%m-%d").date()
 
-    # パスワードが空でなければ更新
     if data.get("user_password"):
         student.user_password = make_password(data.get("user_password"))
 
     student.save()
 
-    # クラス更新
     class_ids = [int(c) for c in data.get("class_ids", [])]
     class_qs = Class.objects.filter(class_id__in=class_ids, school=school)
     student.classes.set(class_qs)

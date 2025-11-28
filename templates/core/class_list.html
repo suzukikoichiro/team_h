@@ -1,46 +1,45 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
 
-<body>
+  <body>
+    <h2>クラス一覧</h2>
+    <a href="{% url 'class_create' %}">新しいクラスを登録</a><br />
+    <table border="1">
+      <thead>
+        <tr>
+          <th>クラスID</th>
+          <th>学年</th>
+          <th>クラス名</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in classes %}
+        <tr>
+          <td>{{ c.class_id }}</td>
+          <td>{{ c.grade }}</td>
+          <td>{{ c.class_name }}</td>
+          <td>
+            <a href="{% url 'class_edit' c.pk %}" class="btn btn-sm btn-primary"
+              >編集
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5">登録されているクラスがありません。</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-<h2>クラス一覧</h2>
-<a href="{% url 'class_create' %}">新しいクラスを登録</a><br />
-<table border="1">
-  <thead>
-    <tr>
-      <th>クラスID</th>
-      <th>学年</th>
-      <th>クラス名</th>
-      <th>編集</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for c in classes %}
-    <tr>
-      <td>{{ c.class_id }}</td>
-      <td>{{ c.grade }}</td>
-      <td>{{ c.class_name }}</td>
-      <td>
-        <a href="{% url 'class_edit' c.pk %}" class="btn btn-sm btn-primary">編集
-        </a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="5">登録されているクラスがありません。</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-<div class="mt-3">
-<a href="{% url 'home' %}">ホームへ戻る</a>
-</div>
-
-</body>
+    <div class="mt-3">
+      <a href="{% url 'home' %}">ホームへ戻る</a>
+    </div>
+  </body>
 </html>

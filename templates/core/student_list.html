@@ -18,9 +18,8 @@
           <th>ふりがな</th>
           <th>性別</th>
           <th>生年月日</th>
-          <th>所属学校</th>
           <th>所属クラス</th>
-          <th>情報編集</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -31,7 +30,6 @@
           <td>{{ student.user_spell }}</td>
           <td>{{ student.get_gender_display }}</td>
           <td>{{ student.birthdate }}</td>
-          <td>{{ student.school.school_name }}</td>
           <td>
             {% for c in student.classes.all %}
               {{ c.class_name }}{% if not forloop.last %}, {% endif %}
