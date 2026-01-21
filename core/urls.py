@@ -27,10 +27,20 @@ urlpatterns = [
     path('student/list/', views.student_list, name='student_list'), 
     path('student/register/', views.student_register, name='student_register'),
     path('students/edit/<int:student_id>/', views.student_edit, name='student_edit'),
-    path('students/delete/<int:student_id>/', views.student_delete, name='student_delete'),
+    path('students/delete/<int:student_id>/', views.student_delete_by_admin, name='student_delete'),
+    path("students/create/", views.student_create, name="student_create"),
+    path("students/<int:student_id>/edit/", views.student_edit, name="student_edit"),
+    path("students/<int:student_id>/delete/", views.student_delete, name="student_delete"),
+    path('teacher/students/delete/<int:student_id>/',views.student_delete_by_teacher,name='student_delete_by_teacher'),
     
     path("api/receive_form/", views.receive_form, name="receive_form"),
     path("api/get_classes/", views.get_classes, name="get_classes"),
     path("api/get_student/", views.get_student, name="get_student"),
     path("api/update_student/<int:student_id>/", views.update_student, name="update_student"),
+    path("api/delete_student/<int:student_id>/",views.delete_student, name="delete_student"),
+    path("api/submit_assignment/", views.submit_assignment, name="submit_assignment"),
+    path("api/get_students/", views.get_students, name="get_students"),
+    path("api/godot_auto_login/", views.godot_auto_login),
+
+
 ]

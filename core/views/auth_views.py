@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from ..forms import UserLoginForm
 from ..models import AdministratorUser, TeacherUser, StudentUser
+from django.shortcuts import render, get_object_or_404, redirect
 
 #認証
 def authenticate_user(user_id, password, school_id):
@@ -60,11 +60,51 @@ def home(request):
     return render(request, 'core/home.html')
 
 
-#教職員はログイン後こちらに遷移
-#更新の場合 return render(request, 'godot/godot.html', {"student_id": 3})
 def godot(request):
+    if not request.session.get("login_user_id"):
+        return redirect("user_login")
     return render(request, 'godot/godot.html')
 
+
+#教職員はログイン後こちらに遷移
+#学生登録
+def student_create(request):
+    if request.method == "POST":
+        # 仮：保存処理（あとでformに置き換えOK）
+        # Student.objects.create(...)
+        return redirect("student_create")
+
+    return render(request, "godot/godot.html", {
+        "mode": "create",
+    })
+
+#学生更新
+def student_edit(request, student_id):
+    student = get_object_or_404(StudentUser, id=student_id)
+
+    if request.method == "POST":
+        # 仮：更新処理
+        # student.name = request.POST["name"]
+        # student.save()
+        return redirect("student_edit", student_id=student.id)
+
+    return render(request, "godot/godot.html", {
+        "mode": "edit",
+        "student": student,
+    })
+
+#学生削除
+def student_delete(request, student_id):
+    student = get_object_or_404(StudentUser, id=student_id)
+
+    if request.method == "POST":
+        student.delete()
+        return redirect("student_create")
+
+    return render(request, "godot/godot.html", {
+        "mode": "delete",
+        "student": student,
+    })
 
 #学生はログイン後こちらに遷移
 def test(request):

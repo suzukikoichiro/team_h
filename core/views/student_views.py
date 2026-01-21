@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 from ..forms import StudentRegisterForm
 from ..models import StudentUser, School
-from ..decorators import admin_required
+from ..decorators import admin_required,teacher_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 
@@ -64,7 +64,16 @@ def student_list(request):
 #管理者による学生削除
 @admin_required
 @require_POST
-def student_delete(request, student_id):
+def student_delete_by_admin(request, student_id):
     student = get_object_or_404(StudentUser, id=student_id)
     student.delete()
     return JsonResponse({'success': True, 'message': f'{student.user_name} を削除しました。'})
+
+
+#教職員による学生削除
+@teacher_required
+@require_POST
+def student_delete_by_teacher(request, student_id):
+    student = get_object_or_404(StudentUser, id=student_id)
+    student.delete()
+    return JsonResponse({'success': True, 'message': '学生を削除しました'})

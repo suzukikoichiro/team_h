@@ -1,68 +1,32 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
 
-<body>
+  <body>
+    <article id="auth-form">
+      <h2>学校・管理者 新規登録</h2>
 
-<h2>学校・管理者 新規登録</h2>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <fieldset style="margin-bottom: 20px">
+          <legend><strong>学校情報</strong></legend>
+          {{ school_form.non_field_errors }} {{ school_form.as_p }}
+        </fieldset>
 
-<form method="post" novalidate>
-  {% csrf_token %}
-  <fieldset style="margin-bottom: 20px">
-    <legend><strong>学校情報</strong></legend>
-    {{ school_form.non_field_errors }} {{ school_form.as_p }}
-  </fieldset>
+        <fieldset>
+          <legend><strong>管理者情報</strong></legend>
+          {{ user_form.non_field_errors }} {{ user_form.as_p }}
+        </fieldset>
 
-  <fieldset>
-    <legend><strong>管理者情報</strong></legend>
-    {{ user_form.non_field_errors }} {{ user_form.as_p }}
-  </fieldset>
-
-  <button type="submit" style="margin-top: 20px">登録</button>
-  <div class="mt-3">
-  <a href="{% url 'school_login' %}">戻る</a>
-  </div>
-</form>
-
-<!-- モーダルウィンdow -->
-<div
-  id="successModal"
-  style="
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-  "
->
-  <div
-    style="
-      background: white;
-      padding: 20px 40px;
-      border-radius: 8px;
-      font-size: 18px;
-      text-align: center;
-    "
-  >
-    登録成功
-  </div>
-</div>
-
-<script>
-  {% if register_success %}
-    const modal = document.getElementById('successModal');
-    modal.style.display = 'flex';
-
-    setTimeout(() => {
-      window.location.href = "{% url 'school_login' %}";
-    }, 800);
-  {% endif %}
-</script>
-
-</body>
+        <button type="submit" style="margin-top: 20px">登録</button>
+        <div class="mt-3">
+          <a href="{% url 'school_login' %}">戻る</a>
+        </div>
+      </form>
+    </article>
+  </body>
 </html>

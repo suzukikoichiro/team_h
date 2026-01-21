@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "core",
     "corsheaders",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -72,6 +73,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "team_h.wsgi.application"
+ASGI_APPLICATION = "team_h.asgi.application"
 
 
 # Database
@@ -133,4 +135,21 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'   # ログイン後のリダイレクト先
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost",
+    "http://127.0.0.1",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost",
+]
+
+ASGI_APPLICATION = "team_h.asgi.application"
+ 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
