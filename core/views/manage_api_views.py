@@ -70,48 +70,77 @@ def get_student(request):
 
 
 
-
-
-
-#教職員による学生登録
 @csrf_exempt
 def receive_form(request):
     if request.method != "POST":
-        return JsonResponse({"error": "POST メソッドで送信してください"}, status=405)
+        return JsonResponse(
+            {"error": "POST メソッドで送信してください"},
+            status=405
+        )
 
+    # =========================
+    # ログイン必須
+    # =========================
+    school_id = request.session.get("school_id")
+    if not school_id:
+        return JsonResponse(
+            {"error": "ログインしていません"},
+            status=401
+        )
+
+    try:
+        school = School.objects.get(id=school_id)
+    except School.DoesNotExist:
+        return JsonResponse(
+            {"error": "学校情報が無効です"},
+            status=400
+        )
+
+    # =========================
+    # JSON 読み取り
+    # =========================
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
-        return JsonResponse({"error": "JSON データが不正です"}, status=400)
+        return JsonResponse(
+            {"error": "JSON データが不正です"},
+            status=400
+        )
 
-    school_id = data.get("school_id")
-    if not school_id:
-        return JsonResponse({"error": "学校IDが送信されていません"}, status=400)
-
-    try:
-        school = School.objects.get(school_id=school_id)
-    except School.DoesNotExist:
-        return JsonResponse({"error": "存在しない学校IDです"}, status=400)
-
-    gender_map = {"男性": 0, "女性": 1, "その他": 2}
-
+    # =========================
+    # 生年月日
+    # =========================
     try:
         birthdate_str = data.get("birthdate", "")
-        birthdate = datetime.datetime.strptime(birthdate_str, "%Y-%m-%d").date()
+        birthdate = datetime.datetime.strptime(
+            birthdate_str, "%Y-%m-%d"
+        ).date()
     except ValueError:
         return JsonResponse({
             "status": "error",
-            "errors": {"birthdate": ["生年月日は YYYY-MM-DD 形式で入力してください"]}
+            "errors": {
+                "birthdate": ["生年月日は YYYY-MM-DD 形式で入力してください"]
+            }
         }, status=400)
-    
+
+    # =========================
+    # user_id（手動 or 自動）
+    # =========================
+    user_id = data.get("user_id")
+    if user_id in ("", None):
+        user_id = None  # ← 自動採番
+
+    # =========================
+    # フォーム
+    # =========================
     form_data = {
-        "user_id": data.get("user_id"),
+        "user_id": user_id,
         "user_name": data.get("user_name"),
         "user_spell": data.get("user_spell"),
         "gender": int(data.get("gender", 2)),
         "birthdate": birthdate,
         "user_password": data.get("user_password"),
-        "user_position": 2,
+        "user_position": 2,  # 学生固定
     }
 
     form = StudentRegisterForm(form_data)
@@ -124,17 +153,33 @@ def receive_form(request):
             "errors": form.errors
         }, status=400)
 
+    # =========================
+    # 保存
+    # =========================
     student = form.save(commit=False)
     student.school = school
-    student.user_password = make_password(form.cleaned_data['user_password'])
+    student.user_password = make_password(
+        form.cleaned_data["user_password"]
+    )
     student.save()
 
+    # =========================
+    # クラス紐付け
+    # =========================
     class_ids = data.get("class_ids", [])
     class_ids = [int(i) for i in class_ids]
-    class_qs = Class.objects.filter(class_id__in=class_ids, school=school)
+
+    class_qs = Class.objects.filter(
+        class_id__in=class_ids,
+        school=school
+    )
     student.classes.set(class_qs)
 
-    return JsonResponse({"status": "ok", "message": "登録完了"})
+    return JsonResponse({
+        "status": "ok",
+        "message": "登録完了"
+    })
+
 
 
 # 学生更新
