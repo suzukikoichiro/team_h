@@ -224,7 +224,6 @@ def update_student(request, student_id):
 
     student.save()
 
-    # ★ 重要：class_ids が送られてきた時だけ更新する
     if "class_ids" in data:
         class_ids = [int(c) for c in data["class_ids"]]
         class_qs = Class.objects.filter(
@@ -338,14 +337,24 @@ def godot_auto_login(request):
     user_position = request.session.get("user_position")
 
     if not school_id or not user_id:
-        return JsonResponse(
-            {"logged_in": False},
-            status=401
-        )
+        return JsonResponse({"logged_in": False}, status=401)
+
+    username = "ユーザー"  # デフォルト
+    try:
+        # 学生か教員かを順番に確認
+        student = StudentUser.objects.get(user_id=user_id, school__school_id=str(school_id))
+        username = student.user_name
+    except StudentUser.DoesNotExist:
+        try:
+            teacher = TeacherUser.objects.get(user_id=user_id, school__school_id=str(school_id))
+            username = teacher.user_name
+        except TeacherUser.DoesNotExist:
+            pass
 
     return JsonResponse({
         "logged_in": True,
         "school_id": school_id,
         "user_id": user_id,
         "user_position": user_position,
+        "username": username,  # ← ここを追加
     })

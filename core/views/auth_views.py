@@ -59,14 +59,13 @@ def user_logout(request):
 def home(request):
     return render(request, 'core/home.html')
 
-
+#教職員はログイン後こちらに遷移
 def godot(request):
     if not request.session.get("login_user_id"):
         return redirect("user_login")
-    return render(request, 'godot/godot.html')
+    return render(request, 'godot/2Dmetaverse.html')
 
 
-#教職員はログイン後こちらに遷移
 #学生登録
 def student_create(request):
     if request.method == "POST":
@@ -74,7 +73,7 @@ def student_create(request):
         # Student.objects.create(...)
         return redirect("student_create")
 
-    return render(request, "godot/godot.html", {
+    return render(request, "godot/2Dmetaverse.html", {
         "mode": "create",
     })
 
@@ -88,7 +87,7 @@ def student_edit(request, student_id):
         # student.save()
         return redirect("student_edit", student_id=student.id)
 
-    return render(request, "godot/godot.html", {
+    return render(request, "godot/2Dmetaverse.html", {
         "mode": "edit",
         "student": student,
     })
@@ -101,11 +100,11 @@ def student_delete(request, student_id):
         student.delete()
         return redirect("student_create")
 
-    return render(request, "godot/godot.html", {
+    return render(request, "godot/2Dmetaverse.html", {
         "mode": "delete",
         "student": student,
     })
 
 #学生はログイン後こちらに遷移
 def test(request):
-    return render(request, 'godot/godot.html', {"student_id": 4})
+    return render(request, 'godot/2Dmetaverse.html', {"student_id": 4})

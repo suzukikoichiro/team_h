@@ -8,7 +8,7 @@
 <body class="bg-light">
   <div class="container mt-4">
     <h2 class="mb-4">教職員一覧</h2>
-<a href="{% url 'teacher_register' %}">新しい教職員を登録</a><br />
+<a href="{% url 'teacher_register' %}">新規教職員登録</a><br />
     {% if teachers %}
     <table class="table table-bordered table-striped shadow-sm">
       <thead class="table-primary">
@@ -38,7 +38,7 @@
             {% endfor %}
           </td>
           <td>
-            <a href="{% url 'teacher_edit' teacher.id %}" class="btn btn-sm btn-primary">編集</a>
+            <a href="{% url 'teacher_edit' teacher.id %}" class="btn btn-sm btn-primary">更新</a>
           </td>
         </tr>
         {% endfor %}
