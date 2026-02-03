@@ -1,15 +1,13 @@
+from django.views.decorators.http import require_http_methods, require_POST
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from ..models import School, StudentUser, Class
-from ..forms import StudentRegisterForm
 from django.contrib.auth.hashers import make_password
-import datetime
-import json
-from ..decorators import teacher_required
-from ..models import  StudentUser, TeacherUser
-from django.views.decorators.http import require_http_methods
+from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.hashers import check_password
+from django.http import JsonResponse
+from ..models import School, Class,  StudentUser,TeacherUser
+from ..forms import StudentRegisterForm
+from ..decorators import teacher_required
+import datetime,json
 
 
 
@@ -215,12 +213,33 @@ def update_student(request, student_id):
         student.gender = int(data["gender"])
 
     if "birthdate" in data and data["birthdate"]:
-        student.birthdate = datetime.datetime.strptime(
-            data["birthdate"], "%Y-%m-%d"
-        ).date()
+        try:
+            student.birthdate = datetime.datetime.strptime(
+                data["birthdate"], "%Y-%m-%d"
+            ).date()
+        except ValueError:
+            return JsonResponse(
+                {"errors": {"birthdate": ["日付形式が正しくありません"]}},
+                status=400
+            )
 
-    if data.get("user_password"):
-        student.user_password = make_password(data["user_password"])
+
+    # パスワード更新
+    if "user_password" in data:
+        password = data["user_password"]
+
+        if password == "":
+            return JsonResponse(
+                {
+                    "errors": {
+                        "user_password": ["パスワードを空にすることはできません"]
+                    }
+                },
+                status=400
+            )
+
+        student.user_password = make_password(password)
+
 
     student.save()
 
@@ -357,4 +376,16 @@ def godot_auto_login(request):
         "user_id": user_id,
         "user_position": user_position,
         "username": username,  # ← ここを追加
+    })
+
+@csrf_exempt
+@require_POST
+def api_logout(request):
+    logout(request)
+
+    # セッション完全破棄したい場合（より安全）
+    request.session.flush()
+
+    return JsonResponse({
+        "success": True
     })

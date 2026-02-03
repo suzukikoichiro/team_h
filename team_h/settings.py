@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-*q0ybr1nkvdc$7u-s&6qsm4!@oph74&mwn0f%(k^y9=f2*tsd#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -148,7 +148,11 @@ CORS_ALLOWED_ORIGINS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost",
+    "http://127.0.0.1",
+    "https://tad-unpoisonable-raina.ngrok-free.dev",
+    "https://*.ngrok-free.dev",
 ]
+
 
 ASGI_APPLICATION = "team_h.asgi.application"
  

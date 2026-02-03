@@ -41,6 +41,6 @@ urlpatterns = [
     path("api/submit_assignment/", views.submit_assignment, name="submit_assignment"),
     path("api/get_students/", views.get_students, name="get_students"),
     path("api/godot_auto_login/", views.godot_auto_login),
-
+    path("api/logout/", views.api_logout, name="api_logout"),
 
 ]
