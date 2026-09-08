@@ -1,0 +1,28 @@
+{% extends 'core/base.html' %}
+{% block title %}バックアップ管理{% endblock %}
+{% block header %}バックアップ管理{% endblock %}
+{% block content %}
+<p>この学校の業務データを保存・復元します。復元すると、現在の学校データはバックアップ時点の内容に置き換わります。</p>
+{% if messages %}{% for message in messages %}<p class="message {{ message.tags }}">{{ message }}</p>{% endfor %}{% endif %}
+<form method="post" action="{% url 'backup_create' %}">
+  {% csrf_token %}<button type="submit">今すぐバックアップを作成</button>
+</form>
+<table>
+  <thead><tr><th>作成日時</th><th>レコード数</th><th>SHA-256</th><th>操作</th></tr></thead>
+  <tbody>
+  {% for archive in archives %}
+    <tr>
+      <td>{{ archive.created_at|date:'Y-m-d H:i:s' }}</td><td>{{ archive.record_count }}</td><td><code>{{ archive.checksum|slice:':12' }}…</code></td>
+      <td>
+        <a href="{% url 'backup_download' archive.id %}">ダウンロード</a>
+        <form method="post" action="{% url 'backup_restore' archive.id %}" style="display:inline">
+          {% csrf_token %}<input name="confirmation" aria-label="復元確認" placeholder="復元する と入力" required>
+          <button type="submit">復元</button>
+        </form>
+      </td>
+    </tr>
+  {% empty %}<tr><td colspan="4">バックアップはまだありません。</td></tr>{% endfor %}
+  </tbody>
+</table>
+<p><a href="{% url 'home' %}">管理ポータルへ戻る</a></p>
+{% endblock %}

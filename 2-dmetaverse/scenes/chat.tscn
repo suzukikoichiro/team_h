@@ -1,0 +1,213 @@
+[gd_scene load_steps=8 format=3 uid="uid://cxcp2uolyanm1"]
+
+[ext_resource type="Theme" uid="uid://be7wfdm2n1fqn" path="res://assets/themes/jp_theme.tres.tres" id="1_sbgww"]
+[ext_resource type="Script" uid="uid://c5dv0ep7vbqq8" path="res://scenes/chat.gd" id="2_eycpi"]
+[ext_resource type="FontFile" uid="uid://dhm4eqxoxyu5j" path="res://assets/fonts/Noto_Sans_JP/static/NotoSansJP-Bold.ttf" id="3_bold"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.972549, 0.976471, 0.980392, 0.99)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.70, 0.75, 0.80, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_input"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.62, 0.70, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 12.0
+content_margin_top = 9.0
+content_margin_right = 12.0
+content_margin_bottom = 9.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_send"]
+bg_color = Color(0.05, 0.38, 0.64, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sidebar"]
+bg_color = Color(0.91, 0.94, 0.96, 1)
+border_width_right = 1
+border_color = Color(0.72, 0.78, 0.84, 1)
+
+[node name="Chat" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("1_sbgww")
+script = ExtResource("2_eycpi")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.04, 0.055, 0.07, 0.42)
+
+[node name="ChatPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -520.0
+offset_top = -330.0
+offset_right = 520.0
+offset_bottom = 330.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="RootHBox" type="HBoxContainer" parent="ChatPanel"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Sidebar" type="PanelContainer" parent="ChatPanel/RootHBox"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_sidebar")
+
+[node name="SidebarMargin" type="MarginContainer" parent="ChatPanel/RootHBox/Sidebar"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="SidebarVBox" type="VBoxContainer" parent="ChatPanel/RootHBox/Sidebar/SidebarMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BackButton" type="Button" parent="ChatPanel/RootHBox/Sidebar/SidebarMargin/SidebarVBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 22
+text = "< 戻る"
+
+[node name="ListTitle" type="Label" parent="ChatPanel/RootHBox/Sidebar/SidebarMargin/SidebarVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.08, 0.11, 0.15, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 24
+text = "会話一覧"
+
+[node name="SearchInput" type="LineEdit" parent="ChatPanel/RootHBox/Sidebar/SidebarMargin/SidebarVBox"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.03, 0.045, 0.065, 1)
+theme_override_colors/font_placeholder_color = Color(0.32, 0.37, 0.43, 1)
+theme_override_colors/font_selected_color = Color(1, 1, 1, 1)
+theme_override_colors/caret_color = Color(0.05, 0.24, 0.46, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 19
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input")
+placeholder_text = "会話相手を検索"
+
+[node name="ContactScroll" type="ScrollContainer" parent="ChatPanel/RootHBox/Sidebar/SidebarMargin/SidebarVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ContactList" type="VBoxContainer" parent="ChatPanel/RootHBox/Sidebar/SidebarMargin/SidebarVBox/ContactScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ChatArea" type="MarginContainer" parent="ChatPanel/RootHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="RootVBox" type="VBoxContainer" parent="ChatPanel/RootHBox/ChatArea"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TopBar" type="HBoxContainer" parent="ChatPanel/RootHBox/ChatArea/RootVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleBox" type="VBoxContainer" parent="ChatPanel/RootHBox/ChatArea/RootVBox/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="ChatPanel/RootHBox/ChatArea/RootVBox/TopBar/TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.08, 0.11, 0.15, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 30
+text = "会話一覧"
+
+[node name="StatusLabel" type="Label" parent="ChatPanel/RootHBox/ChatArea/RootVBox/TopBar/TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.25, 0.32, 0.40, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 17
+text = "接続中..."
+
+[node name="ChatScroll" type="ScrollContainer" parent="ChatPanel/RootHBox/ChatArea/RootVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+theme = ExtResource("1_sbgww")
+
+[node name="MessageList" type="VBoxContainer" parent="ChatPanel/RootHBox/ChatArea/RootVBox/ChatScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_sbgww")
+theme_override_constants/separation = 10
+
+[node name="InputContainer" type="HBoxContainer" parent="ChatPanel/RootHBox/ChatArea/RootVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MessageInput" type="TextEdit" parent="ChatPanel/RootHBox/ChatArea/RootVBox/InputContainer"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.03, 0.045, 0.065, 1)
+theme_override_colors/font_selected_color = Color(1, 1, 1, 1)
+theme_override_colors/caret_color = Color(0.05, 0.24, 0.46, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input")
+
+[node name="SendButton" type="Button" parent="ChatPanel/RootHBox/ChatArea/RootVBox/InputContainer"]
+custom_minimum_size = Vector2(108, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("StyleBoxFlat_send")
+theme_override_styles/hover = SubResource("StyleBoxFlat_send")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_send")
+text = "送信"

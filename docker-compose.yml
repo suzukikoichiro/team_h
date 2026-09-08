@@ -1,0 +1,71 @@
+name: 2dmetaverse-local
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nakama
+      POSTGRES_PASSWORD: localdb
+      POSTGRES_USER: nakama
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nakama -d nakama"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - nakama-postgres:/var/lib/postgresql/data
+
+  nakama:
+    image: heroiclabs/nakama:3.22.0
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -ecx
+      - >
+        /nakama/nakama migrate up --database.address nakama:localdb@postgres:5432/nakama &&
+        exec /nakama/nakama --config /nakama/data/local.yml --database.address nakama:localdb@postgres:5432/nakama
+    ports:
+      - "7350:7350"
+      - "7351:7351"
+    volumes:
+      - ./nakama/local.yml:/nakama/data/local.yml:ro
+
+  django:
+    build:
+      context: ./team_h
+    restart: unless-stopped
+    depends_on:
+      nakama:
+        condition: service_started
+    environment:
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
+      DJANGO_SECRET_KEY: "local-container-development-key"
+      DJANGO_EMAIL_BACKEND: "django.core.mail.backends.smtp.EmailBackend"
+      DJANGO_EMAIL_HOST: "smtp.gmail.com"
+      DJANGO_EMAIL_PORT: "587"
+      DJANGO_EMAIL_HOST_USER: "${GMAIL_ADDRESS:-}"
+      DJANGO_EMAIL_HOST_PASSWORD: "${GMAIL_APP_PASSWORD:-}"
+      DJANGO_EMAIL_USE_TLS: "1"
+      DJANGO_DEFAULT_FROM_EMAIL: "${GMAIL_ADDRESS:-noreply@metaverse.local}"
+      NAKAMA_SCHEME: "http"
+      # Godot runs outside Docker, so the API must return the host-mapped address.
+      NAKAMA_HOST: "127.0.0.1"
+      NAKAMA_PORT: "7350"
+      NAKAMA_SERVER_KEY: "defaultkey"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./team_h:/app
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=5)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  nakama-postgres:

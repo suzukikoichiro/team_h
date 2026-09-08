@@ -1,0 +1,18 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Exported builds and transient logs
+/build/
+/exports/
+*.log
+*.tmp
+*.cab
+
+# Raw/reference assets excluded from export presets
+/test/
+/Sprites/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

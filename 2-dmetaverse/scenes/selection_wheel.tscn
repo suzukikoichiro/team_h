@@ -1,0 +1,52 @@
+[gd_scene load_steps=8 format=3 uid="uid://byems53gk56qb"]
+
+[ext_resource type="Script" uid="uid://b6y6vgf77qkr4" path="res://scripts/selection_wheel.gd" id="1_t3epp"]
+[ext_resource type="Script" uid="uid://gmnxlprtfpag" path="res://wheel_option.gd" id="2_eaakd"]
+[ext_resource type="Texture2D" uid="uid://durqa4f3q3wx3" path="res://assets/textures/smileys-emotion-00.png" id="3_pglco"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gu6r8"]
+atlas = ExtResource("3_pglco")
+region = Rect2(720, 1080, 72, 72)
+script = ExtResource("2_eaakd")
+name = "None"
+metadata/_custom_type_script = "uid://gmnxlprtfpag"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xxnyx"]
+atlas = ExtResource("3_pglco")
+region = Rect2(432, 0, 72, 72)
+script = ExtResource("2_eaakd")
+metadata/_custom_type_script = "uid://gmnxlprtfpag"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i6x0t"]
+atlas = ExtResource("3_pglco")
+region = Rect2(1080, 0, 72, 72)
+script = ExtResource("2_eaakd")
+metadata/_custom_type_script = "uid://gmnxlprtfpag"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u3aio"]
+atlas = ExtResource("3_pglco")
+region = Rect2(1080, 144, 72, 72)
+script = ExtResource("2_eaakd")
+metadata/_custom_type_script = "uid://gmnxlprtfpag"
+
+[node name="SelectionWheel" type="Control"]
+visible = false
+top_level = true
+z_index = 4096
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -640.0
+offset_top = -360.0
+offset_right = -639.0
+offset_bottom = -359.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_t3epp")
+bkg_color = Color(0.19434929, 0.19434926, 0.19434926, 1)
+line_color = Color(0.69965345, 0.69965345, 0.69965345, 1)
+highlight_color = Color(0.39308554, 0.39308554, 0.39308533, 1)
+options = Array[ExtResource("2_eaakd")]([SubResource("AtlasTexture_gu6r8"), SubResource("AtlasTexture_xxnyx"), SubResource("AtlasTexture_i6x0t"), SubResource("AtlasTexture_u3aio")])

@@ -1,0 +1,207 @@
+[gd_scene load_steps=7 format=3 uid="uid://bbplc88vxaubn"]
+
+[ext_resource type="Theme" uid="uid://be7wfdm2n1fqn" path="res://assets/themes/jp_theme.tres.tres" id="1_s5wti"]
+[ext_resource type="Script" path="res://scenes/login.gd" id="2_rjcgm"]
+[ext_resource type="FontFile" uid="uid://dhm4eqxoxyu5j" path="res://assets/fonts/Noto_Sans_JP/static/NotoSansJP-Bold.ttf" id="3_bold"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.972549, 0.976471, 0.980392, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.78, 0.82, 0.86, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_input"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.68, 0.73, 0.78, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
+bg_color = Color(0.117647, 0.447059, 0.701961, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="Login" type="CanvasLayer"]
+layer = 20
+script = ExtResource("2_rjcgm")
+
+[node name="Dim" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("1_s5wti")
+
+[node name="Backdrop" type="ColorRect" parent="Dim"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.055, 0.07, 0.55)
+
+[node name="LoginPanel" type="PanelContainer" parent="Dim"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -250.0
+offset_right = 260.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="Dim/LoginPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="RootVBox" type="VBoxContainer" parent="Dim/LoginPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Dim/LoginPanel/Margin/RootVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.09, 0.12, 0.16, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 34
+text = "メタバース ログイン"
+
+[node name="Help" type="Label" parent="Dim/LoginPanel/Margin/RootVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.42, 0.49, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 18
+text = "学校ID、ユーザーID、パスワードを入力してください。"
+autowrap_mode = 3
+
+[node name="SchoolInput" type="LineEdit" parent="Dim/LoginPanel/Margin/RootVBox"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.03, 0.045, 0.065, 1)
+theme_override_colors/font_placeholder_color = Color(0.32, 0.37, 0.43, 1)
+theme_override_colors/font_selected_color = Color(1, 1, 1, 1)
+theme_override_colors/caret_color = Color(0.05, 0.24, 0.46, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input")
+placeholder_text = "学校ID"
+
+[node name="UserInput" type="LineEdit" parent="Dim/LoginPanel/Margin/RootVBox"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.03, 0.045, 0.065, 1)
+theme_override_colors/font_placeholder_color = Color(0.32, 0.37, 0.43, 1)
+theme_override_colors/font_selected_color = Color(1, 1, 1, 1)
+theme_override_colors/caret_color = Color(0.05, 0.24, 0.46, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input")
+placeholder_text = "ユーザーID"
+
+[node name="PasswordInput" type="LineEdit" parent="Dim/LoginPanel/Margin/RootVBox"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.03, 0.045, 0.065, 1)
+theme_override_colors/font_placeholder_color = Color(0.32, 0.37, 0.43, 1)
+theme_override_colors/font_selected_color = Color(1, 1, 1, 1)
+theme_override_colors/caret_color = Color(0.05, 0.24, 0.46, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input")
+placeholder_text = "パスワード"
+secret = true
+
+[node name="OtpInput" type="LineEdit" parent="Dim/LoginPanel/Margin/RootVBox"]
+visible = false
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.03, 0.045, 0.065, 1)
+theme_override_colors/font_placeholder_color = Color(0.32, 0.37, 0.43, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input")
+placeholder_text = "6桁の認証コード"
+max_length = 6
+
+[node name="EmailInput" type="LineEdit" parent="Dim/LoginPanel/Margin/RootVBox"]
+visible = false
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.03, 0.045, 0.065, 1)
+theme_override_colors/font_placeholder_color = Color(0.32, 0.37, 0.43, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input")
+placeholder_text = "メールアドレス"
+
+[node name="RememberCheck" type="CheckBox" parent="Dim/LoginPanel/Margin/RootVBox"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.09, 0.12, 0.16, 1)
+theme_override_colors/font_hover_color = Color(0.09, 0.12, 0.16, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.09, 0.12, 0.16, 1)
+theme_override_colors/font_pressed_color = Color(0.09, 0.12, 0.16, 1)
+theme_override_colors/font_focus_color = Color(0.09, 0.12, 0.16, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 18
+text = "学校IDとユーザーIDを保存する"
+
+[node name="LoginButton" type="Button" parent="Dim/LoginPanel/Margin/RootVBox"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button")
+text = "ログイン"
+
+[node name="ResendOtpButton" type="Button" parent="Dim/LoginPanel/Margin/RootVBox"]
+visible = false
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 18
+text = "認証コードを再送信"
+
+[node name="MessageLabel" type="Label" parent="Dim/LoginPanel/Margin/RootVBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.17, 0.17, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 17
+autowrap_mode = 3

@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>メールアドレス変更</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260902" />
+  </head>
+  <body>
+    <article id="auth-form">
+      <h2>メールアドレス変更</h2>
+      <p>現在: {{ current_email }}</p>
+      {% if message %}<p>{{ message }}</p>{% endif %}
+      {% if pending_email %}
+        <p>{{ pending_email }} に送信した6桁の認証コードを入力してください。</p>
+        <form method="post" novalidate>
+          {% csrf_token %}<input type="hidden" name="action" value="verify_otp" />
+          {{ otp_form.as_p }}<button type="submit">認証して変更</button>
+        </form>
+        <form method="post">
+          {% csrf_token %}<input type="hidden" name="action" value="resend_otp" />
+          <button type="submit">認証コードを再送信</button>
+        </form>
+      {% else %}
+        <form method="post" novalidate>
+          {% csrf_token %}<input type="hidden" name="action" value="request_change" />
+          {{ form.as_p }}<button type="submit">認証コードを送信</button>
+        </form>
+      {% endif %}
+      <p><a href="{% url 'home' %}">ホームへ戻る</a></p>
+    </article>
+  </body>
+</html>

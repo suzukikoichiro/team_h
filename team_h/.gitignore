@@ -1,0 +1,23 @@
+__pycache__/
+*.pyc
+
+# Local runtime state
+db.sqlite3
+*.sqlite3
+
+# Collected/generated assets
+staticfiles/
+static/godot/
+media/backups/
+media/lesson_videos/
+media/
+
+# Python and tooling
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

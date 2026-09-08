@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bqvggjl6y7i0a"]
+
+[ext_resource type="Script" uid="uid://b0k0ibj6gh1py" path="res://scripts/stamp.gd" id="1_ujkf0"]
+
+[node name="Stamp" type="Node2D"]
+script = ExtResource("1_ujkf0")
+
+[node name="Icon" type="Sprite2D" parent="."]

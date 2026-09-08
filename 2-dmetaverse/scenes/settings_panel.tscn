@@ -1,0 +1,167 @@
+[gd_scene load_steps=4 format=3 uid="uid://cmhb1rhmtv6ca"]
+
+[ext_resource type="Script" uid="uid://clt4mmelv1dvk" path="res://scripts/settings_panel.gd" id="1_qtqyt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_settings_panel"]
+bg_color = Color(0.055, 0.07, 0.12, 0.985)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.38, 0.56, 0.8, 0.85)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_settings_content"]
+bg_color = Color(0.08, 0.1, 0.16, 0.82)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.26, 0.36, 0.5, 0.72)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="SettingsPanel" type="Control"]
+custom_minimum_size = Vector2(760, 700)
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -380.0
+offset_top = -350.0
+offset_right = 380.0
+offset_bottom = 350.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qtqyt")
+
+[node name="ColorRect" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_settings_panel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 34.0
+offset_top = 30.0
+offset_right = -34.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="Header" type="VBoxContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Title" type="Label" parent="VBoxContainer/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.84, 0.93, 1, 1)
+theme_override_font_sizes/font_size = 30
+text = "オプション"
+
+[node name="Description" type="Label" parent="VBoxContainer/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.63, 0.72, 0.84, 1)
+theme_override_font_sizes/font_size = 15
+text = "表示・音量・チャット・アカウントに関する設定を変更できます"
+
+[node name="ContentPanel" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_settings_content")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/ContentPanel"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="ContentMargin" type="MarginContainer" parent="VBoxContainer/ContentPanel/ScrollContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 20
+
+[node name="ContentBox" type="VBoxContainer" parent="VBoxContainer/ContentPanel/ScrollContainer/ContentMargin"]
+custom_minimum_size = Vector2(540, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="SoundSection" type="Label" parent="VBoxContainer/ContentPanel/ScrollContainer/ContentMargin/ContentBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.56, 0.76, 1, 1)
+theme_override_font_sizes/font_size = 21
+text = "音声・表示"
+
+[node name="SoundOption" type="HBoxContainer" parent="VBoxContainer/ContentPanel/ScrollContainer/ContentMargin/ContentBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="VBoxContainer/ContentPanel/ScrollContainer/ContentMargin/ContentBox/SoundOption"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "　音量"
+
+[node name="HSlider" type="HSlider" parent="VBoxContainer/ContentPanel/ScrollContainer/ContentMargin/ContentBox/SoundOption"]
+custom_minimum_size = Vector2(260, 34)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SoundButton" type="Button" parent="VBoxContainer/ContentPanel/ScrollContainer/ContentMargin/ContentBox/SoundOption"]
+custom_minimum_size = Vector2(108, 34)
+layout_mode = 2
+text = "ミュート"
+
+[node name="ColorOption" type="HBoxContainer" parent="VBoxContainer/ContentPanel/ScrollContainer/ContentMargin/ContentBox"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="VBoxContainer/ContentPanel/ScrollContainer/ContentMargin/ContentBox/ColorOption"]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "　色覚サポート"
+
+[node name="ColorOptionButton" type="OptionButton" parent="VBoxContainer/ContentPanel/ScrollContainer/ContentMargin/ContentBox/ColorOption"]
+custom_minimum_size = Vector2(180, 34)
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "無補正"
+popup/item_0/id = 0
+popup/item_1/text = "緑弱"
+popup/item_1/id = 1
+popup/item_2/text = "赤弱"
+popup/item_2/id = 2
+popup/item_3/text = "青弱"
+popup/item_3/id = 3
+
+[node name="CloseButton" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "閉じる"
+
+[connection signal="value_changed" from="VBoxContainer/ContentPanel/ScrollContainer/ContentMargin/ContentBox/SoundOption/HSlider" to="." method="_on_h_slider_value_changed"]
+[connection signal="pressed" from="VBoxContainer/ContentPanel/ScrollContainer/ContentMargin/ContentBox/SoundOption/SoundButton" to="." method="_on_sound_button_pressed"]

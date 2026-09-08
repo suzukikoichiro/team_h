@@ -1,0 +1,101 @@
+[gd_scene load_steps=6 format=3 uid="uid://cs6uq8pbv2hbh"]
+
+[ext_resource type="Script" path="res://scenes/school_commute.gd" id="1_commute"]
+[ext_resource type="Theme" uid="uid://be7wfdm2n1fqn" path="res://assets/themes/jp_theme.tres.tres" id="2_theme"]
+[ext_resource type="FontFile" uid="uid://dhm4eqxoxyu5j" path="res://assets/fonts/Noto_Sans_JP/static/NotoSansJP-Bold.ttf" id="3_bold"]
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.965, 0.976, 0.984, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.62, 0.7, 0.76, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="ProgressFill"]
+bg_color = Color(0.13, 0.48, 0.68, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="SchoolCommute" type="CanvasLayer"]
+layer = 30
+script = ExtResource("1_commute")
+
+[node name="Root" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+
+[node name="Backdrop" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.055, 0.075, 0.085, 1)
+
+[node name="Panel" type="PanelContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -310.0
+offset_top = -140.0
+offset_right = 310.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="Margin" type="MarginContainer" parent="Root/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 34
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 34
+theme_override_constants/margin_bottom = 28
+
+[node name="Box" type="VBoxContainer" parent="Root/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Root/Panel/Margin/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.07, 0.1, 0.13, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 36
+text = "登校中..."
+horizontal_alignment = 1
+
+[node name="PercentLabel" type="Label" parent="Root/Panel/Margin/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.16, 0.2, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 24
+text = "登校中... 現在0%"
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="Root/Panel/Margin/Box"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+theme_override_styles/fill = SubResource("ProgressFill")
+show_percentage = false
+
+[node name="StatusLabel" type="Label" parent="Root/Panel/Margin/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.37, 0.42, 1)
+theme_override_fonts/font = ExtResource("3_bold")
+theme_override_font_sizes/font_size = 18
+text = "ログイン情報を確認中"
+horizontal_alignment = 1

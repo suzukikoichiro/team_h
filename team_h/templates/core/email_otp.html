@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260902" />
+  </head>
+  <body>
+    <article id="auth-form">
+      <h2>{{ title }}</h2>
+      <p>{{ masked_email }} に送信した6桁の認証コードを入力してください。</p>
+      {% if message %}<p>{{ message }}</p>{% endif %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="action" value="verify_otp" />
+        {{ otp_form.as_p }}
+        <button type="submit">認証して登録</button>
+      </form>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="resend_otp" />
+        <button type="submit">認証コードを再送信</button>
+      </form>
+      <p><a href="{% url cancel_url %}">入力画面へ戻る</a></p>
+    </article>
+  </body>
+</html>

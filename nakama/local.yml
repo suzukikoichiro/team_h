@@ -1,0 +1,15 @@
+name: 2dmetaverse
+
+socket:
+  server_key: defaultkey
+
+session:
+  token_expiry_sec: 7200
+  refresh_token_expiry_sec: 86400
+
+console:
+  username: admin
+  password: password
+
+logger:
+  level: INFO

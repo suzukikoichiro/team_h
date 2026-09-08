@@ -1,0 +1,97 @@
+{% load static %}
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="自分のペースで学校・人・学びとつながる、2Dメタバース型不登校支援システム" />
+    <title>つながる教室 | 2Dメタバース型不登校支援</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260713" />
+  </head>
+  <body class="landing-page">
+    <header class="landing-header">
+      <a class="brand" href="#top" aria-label="つながる教室 トップへ">つながる<span>教室</span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu">メニュー <span aria-hidden="true">☰</span></button>
+      <nav id="site-menu" class="site-menu" aria-label="ページ内メニュー">
+        <a href="#concept">コンセプト</a>
+        <a href="#features">できること</a>
+        <a href="#value">選ばれる理由</a>
+        <a class="nav-login" href="{% url 'school_login' %}">学校管理者ログイン</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">2D METAVERSE FOR SCHOOL CONNECTION</p>
+          <h1><span>「登校」を唯一の</span><span>正解にしない。</span></h1>
+          <p class="hero-text">自分のペースで、学校・人・学びとつながれる。<br />不登校の生徒に、もう一つの安心できる教室を届けます。</p>
+          <a class="primary-cta" href="#concept">このシステムについて <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="hero-visual" aria-label="オンラインの教室で生徒と先生がつながるイメージ">
+          <div class="sun"></div>
+          <div class="cloud cloud-one"></div><div class="cloud cloud-two"></div>
+          <div class="school-building"><span></span><span></span><span></span><span></span><i></i></div>
+          <div class="ground"></div>
+          <img class="avatar avatar-student" src="{% static 'metaverse/skin_01/idle/1.png' %}" alt="生徒のアバタースキン" />
+          <img class="avatar avatar-teacher" src="{% static 'metaverse/skin_02/idle/1.png' %}" alt="教職員のアバタースキン" />
+          <div class="speech student-speech">こんにちは</div>
+          <div class="speech teacher-speech">待ってるね</div>
+          <div class="plant"><i></i><i></i><i></i><b></b></div>
+        </div>
+      </section>
+
+      <section id="concept" class="concept-section section-wrap">
+        <p class="section-kicker">CONCEPT</p>
+        <h2>学校とのつながりを、<br />本人の選択からはじめる。</h2>
+        <p>不登校支援のゴールは、ただ登校することではありません。本人が進路を主体的にとらえ、社会的に自立することです。<br class="desktop-only" />「つながる教室」は、現実の教室に入れない日にも、学校との関係を自分の速度で保てる場所です。</p>
+      </section>
+
+      <section id="features" class="feature-section">
+        <div class="section-wrap">
+          <p class="section-kicker">FEATURES</p>
+          <h2>安心して、一歩ずつ。</h2>
+          <div class="feature-grid">
+            <article class="feature-card"><span class="feature-number">01</span><div class="feature-icon">◎</div><h3>気分と意思を尊重</h3><p>ログイン時にその日の気分と、話しかけてよいかを自分で選択。無理のない関わり方を守ります。</p></article>
+            <article class="feature-card"><span class="feature-number">02</span><div class="feature-icon">♧</div><h3>自然にはじまる交流</h3><p>アバターで同じ空間に入り、近くの相手へ話しかける。現実の教室に近い、やわらかな交流です。</p></article>
+            <article class="feature-card"><span class="feature-number">03</span><div class="feature-icon">▷</div><h3>学びを止めない</h3><p>ライブ授業、授業録画、コメント機能を通じ、欠席中でも自分に合う形で学びに参加できます。</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="value" class="value-section section-wrap">
+        <div class="value-copy"><p class="section-kicker">WHY IT MATTERS</p><h2>小さな前進を、<br />みんなの成長に。</h2><p>ログイン、会話、授業への参加といった日々の小さな行動が、学校ごとの植物を育てます。出席率を競うのではなく、参加の積み重ねを前向きに可視化する仕組みです。</p></div>
+        <div class="growth-card"><span>みんなの小さな一歩で</span><div class="growth-plant"><i></i><i></i><i></i><i></i><b></b></div><strong>学校の植物が育つ</strong><small>ログイン・会話・授業参加</small></div>
+      </section>
+
+      <section class="system-section">
+        <div class="section-wrap"><p class="section-kicker">SYSTEM</p><h2>学校で安心して運用できる設計。</h2><div class="system-list"><div><b>生徒</b><span>2Dメタバースで交流・学習・予定管理</span></div><div><b>教職員</b><span>個別の相談、授業配信、連絡を支援</span></div><div><b>管理者</b><span>学校・クラス・利用者情報を一元管理</span></div></div></div>
+      </section>
+
+      <section class="closing-section">
+        <p>現実の教室に入れない日にも、<br />つながる選択肢を残す。</p>
+        <h2>一人ひとりの「できた」を<br />大切にする学校へ。</h2>
+        <a class="login-cta" href="{% url 'school_login' %}">学校管理者ログイン <span aria-hidden="true">→</span></a>
+      </section>
+    </main>
+
+    <footer class="landing-footer"><a class="brand" href="#top">つながる<span>教室</span></a><small>2Dメタバース型不登校支援システム</small></footer>
+    <script>
+      const toggle = document.querySelector('.menu-toggle');
+      const menu = document.querySelector('.site-menu');
+      toggle.addEventListener('click', () => {
+        const isOpen = menu.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', isOpen);
+      });
+      document.addEventListener('click', (event) => {
+        if (!menu.classList.contains('is-open') || menu.contains(event.target) || toggle.contains(event.target)) return;
+        menu.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+      menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
+        menu.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }));
+    </script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260623">
+</head>
+
+<body>
+
+<h2>クラス登録</h2>
+
+<form method="POST">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit">登録</button>
+</form>
+
+<div class="mt-3">
+<a href="{% url 'home' %}">ホームへ戻る</a>
+</div>
+
+</body>
+</html>
