@@ -1,7 +1,7 @@
 # 2D Metaverse 共有用リポジトリ
 
 Godot 4.5 のWindowsクライアント、Django、NakamaとDocker起動設定をまとめたソース一式です。
-2026-09-08時点の作業ファイルを取り込んだ独立リポジトリです。元の2つのリポジトリの履歴やローカル設定は含みません。
+2026-09-08時点の作業ファイルを取り込み、既存のGitHubリポジトリ `suzukikoichiro/team_h` の履歴を引き継いでいます。ローカルのGit認証設定は含みません。
 今後の共同開発はこのフォルダで行ってください。元フォルダの変更は自動では反映されません。
 
 ## 構成
@@ -13,20 +13,14 @@ Godot 4.5 のWindowsクライアント、Django、NakamaとDocker起動設定を
 - `docker-compose.yml`: Django、Nakama、PostgreSQLの起動設定
 - `.env.example`: メール送信設定のひな型
 
-DB、登録済みアカウント、アップロードデータ、実際の.env、Godot本体、ビルド済みexe/pck、仮想環境は含みません。
+現在のファイル一式にはDB、登録済みアカウント、アップロードデータ、実際の.env、Godot本体、ビルド済みexe/pck、仮想環境は含みません。既存のGit履歴に登録されていたファイルは過去の履歴に残ります。
 既存のdocsには以前の機能や配布方式の記述もあります。初回取得はこのREADMEを参照してください。
 
 ## 受け取り方
 
 ### GitHubで共有する場合
 
-所有者がGitHub上に空のリポジトリを作成します。READMEや.gitignoreはGitHub側で追加しません。
-以下のOWNERを所有者名に置き換え、共有用フォルダで実行します。
-
-```powershell
-git remote add origin https://github.com/OWNER/metaverse-shared.git
-git push -u origin main
-```
+共有先は [suzukikoichiro/team_h](https://github.com/suzukikoichiro/team_h) のmainです。
 
 非公開リポジトリの場合は共同作業者を招待し、受け取る人が招待を承認してから自分のGitHubアカウントで認証します。
 パスワードやトークンをURLに埋め込まないでください。
@@ -34,7 +28,7 @@ git push -u origin main
 受け取る人はGitをインストールし、保存先の親フォルダで実行します。
 
 ```powershell
-git clone --branch main https://github.com/OWNER/metaverse-shared.git
+git clone --branch main https://github.com/suzukikoichiro/team_h.git metaverse-shared
 cd metaverse-shared
 ```
 
@@ -44,6 +38,8 @@ cd metaverse-shared
 git switch main
 git pull --ff-only origin main
 ```
+
+旧Django単体構成から更新する場合、Djangoのファイルはリポジトリ直下から `team_h/` に移っています。手動起動時の作業ディレクトリや既存のデプロイ設定も合わせて変更してください。新規起動はルートのDocker Composeを使用します。
 
 ### GitHubを使わずbundleで渡す場合
 
@@ -58,7 +54,7 @@ cd metaverse-shared
 bundleは作成時点のスナップショットです。GitHub公開後に更新を受け取る場合は接続先を変更します。
 
 ```powershell
-git remote set-url origin https://github.com/OWNER/metaverse-shared.git
+git remote set-url origin https://github.com/suzukikoichiro/team_h.git
 git pull --ff-only origin main
 ```
 
