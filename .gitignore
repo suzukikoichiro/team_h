@@ -10,7 +10,9 @@ venv/
 .venv/
 .codex/
 .codex-tmp/
-/build/
+/build/*
+!/build/2Dmetaverse.exe
+!/build/2Dmetaverse.pck
 /godot/
 /tools/godot/
 *.log
